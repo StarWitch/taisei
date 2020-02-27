@@ -659,23 +659,19 @@ static void stage_finalize(void *arg) {
 }
 
 void stage_finish(int gameover) {
-	log_debug("got here 1");
 	if(global.gameover == GAMEOVER_TRANSITIONING) {
 		return;
 	}
 
 	int prev_gameover = global.gameover;
 	global.gameover_time = global.frames;
-	log_debug("got here 2");
 
 	if(gameover == GAMEOVER_SCORESCREEN) {
 		global.gameover = GAMEOVER_SCORESCREEN;
 	} else {
 		global.gameover = GAMEOVER_TRANSITIONING;
 		set_transition_callback(TransFadeBlack, FADE_TIME, FADE_TIME*2, stage_finalize, (void*)(intptr_t)gameover);
-		log_debug("got here 3");
 		stage_fade_bgm();
-		log_debug("got here 4");
 	}
 
 	if(
