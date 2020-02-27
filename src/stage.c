@@ -125,6 +125,7 @@ void stage_init_array(void) {
 
 	add_stage(0xC0, &corotest_procs, STAGE_SPECIAL, "Coroutines!", "wow such concurrency very async", NULL, D_Any);
 	add_stage(0xC1, &extra_procs, STAGE_SPECIAL, "Extra Stage", "Descent into Madness", NULL, D_Extra);
+	add_stage(0xC2, &tutorial_procs, STAGE_SPECIAL, "Tutorial", "Learning how to code stages", NULL, D_Normal);
 
 	end_stages();
 
@@ -658,19 +659,23 @@ static void stage_finalize(void *arg) {
 }
 
 void stage_finish(int gameover) {
+	log_debug("got here 1");
 	if(global.gameover == GAMEOVER_TRANSITIONING) {
 		return;
 	}
 
 	int prev_gameover = global.gameover;
 	global.gameover_time = global.frames;
+	log_debug("got here 2");
 
 	if(gameover == GAMEOVER_SCORESCREEN) {
 		global.gameover = GAMEOVER_SCORESCREEN;
 	} else {
 		global.gameover = GAMEOVER_TRANSITIONING;
 		set_transition_callback(TransFadeBlack, FADE_TIME, FADE_TIME*2, stage_finalize, (void*)(intptr_t)gameover);
+		log_debug("got here 3");
 		stage_fade_bgm();
+		log_debug("got here 4");
 	}
 
 	if(

@@ -13,6 +13,8 @@ stages_src = files(
     'stage6.c',
     'stage6_events.c',
     'extra.c',
+    'tutorial.c',
+    'tutorial_events.c',
 )
 
 if is_developer_build
