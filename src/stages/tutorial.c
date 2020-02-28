@@ -20,7 +20,7 @@
 #include "common_tasks.h"
 
 static void tut_start(void) {
-
+	tut_events();
 }
 
 static void tut_end(void) {
@@ -33,6 +33,5 @@ StageProcs tutorial_procs = {
 	.end = tut_end,
 	//.draw = tut_draw,
 	//.update = tut_update,
-	.event = tut_events,
 	//.shader_rules = tut_shaders,
 };
