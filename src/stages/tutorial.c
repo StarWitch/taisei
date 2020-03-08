@@ -20,7 +20,7 @@
 #include "common_tasks.h"
 
 static void tut_start(void) {
-	tut_events();
+	INVOKE_TASK(tutorial_main);
 }
 
 static void tut_end(void) {

@@ -57,7 +57,7 @@ TASK(burst_fairies_1, NO_ARGS) {
 	}
 }
 
-TASK(tutorial_timeline, NO_ARGS) {
+DEFINE_EXTERN_TASK(tutorial_main) {
 	INVOKE_TASK_DELAYED(100, burst_fairies_1);
 
 	WAIT(1000);
@@ -65,15 +65,5 @@ TASK(tutorial_timeline, NO_ARGS) {
 	//WAIT_EVENT(&global.dialog->events.fadeout_began);
 	WAIT(5);
 	stage_finish(GAMEOVER_SCORESCREEN);
-}
-
-void tut_events(void) {
-	TIMER(&global.timer);
-
-	AT(0) {
-		INVOKE_TASK(tutorial_timeline);
-	}
-
-	return;
 }
 

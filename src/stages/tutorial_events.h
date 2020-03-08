@@ -13,6 +13,6 @@
 
 #include "stage.h"
 
-void tut_events(void);
+DECLARE_EXTERN_TASK(tutorial_main, NO_ARGS);
 
 #endif // IGUARD_stages_tutorial_h
