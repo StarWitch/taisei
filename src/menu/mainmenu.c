@@ -108,6 +108,7 @@ MenuData* create_main_menu(void) {
 #ifdef DEBUG
 	add_menu_entry(m, "Select Stage", menu_action_enter_stagemenu, NULL);
 #endif
+	add_menu_entry(m, "Manual / Tutorial", menu_action_enter_manualtutorial, NULL);
 	add_menu_entry(m, "Replays", menu_action_enter_replayview, NULL);
 	add_menu_entry(m, "Music Room", menu_action_enter_musicroom, NULL);
 	add_menu_entry(m, "Options", menu_action_enter_options, NULL);

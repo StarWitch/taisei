@@ -15,4 +15,5 @@ menu_src = files(
     'stagepractice.c',
     'stageselect.c',
     'submenus.c',
+    'manualtutorial.c',
 )
