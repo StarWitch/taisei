@@ -134,7 +134,7 @@ typedef struct {
 
 	StageInfo *stage;
 
-	Trainer tnr;
+	Trainer trainer;
 
 	uint is_practice_mode : 1;
 	uint is_headless : 1;

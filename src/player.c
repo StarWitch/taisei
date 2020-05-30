@@ -633,6 +633,19 @@ static bool player_can_bomb(Player *plr) {
 
 }
 
+static bool player_can_bomb(Player *plr) {
+	// this function checks a bunch of conditions to see if the player is capable of bombing
+	// 1. isn't currently using a bomb
+	// 2. has enough bombs OR Developer God Mode enabled OR Trainer Invulnerability enabled
+	// 3. isn't currently respawning
+
+	if(!player_is_bomb_active(plr) && (plr->bombs > 0 || plr->iddqd || trainer_bombs_enabled()) && global.frames >= plr->respawntime) {
+		return true;
+	}
+	return false;
+}
+
+
 static bool player_bomb(Player *plr) {
 	if(global.boss && global.boss->current && global.boss->current->type == AT_ExtraSpell)
 		return false;
@@ -643,7 +656,7 @@ static bool player_bomb(Player *plr) {
 		return false;
 	}
 
-	if(player_can_bomb(plr)) {
+	if (player_can_bomb(plr)) {
 		stats_track_bomb_used(&plr->stats);
 		player_fail_spell(plr);
 		// player_cancel_powersurge(plr);
@@ -664,7 +677,7 @@ static bool player_bomb(Player *plr) {
 
 		if(plr->bombs < 0) {
 			if (trainer_bombs_enabled()) {
-				trainer_append_bomb_event(&global.tnr);
+				trainer_append_bomb_event(&global.trainer);
 			}
 			plr->bombs = 0;
 		}
@@ -873,19 +886,26 @@ void player_realdeath(Player *plr) {
 	int total_power = plr->power + plr->power_overflow;
 
 	if (!trainer_no_powerdown_enabled()) {
+<<<<<<< HEAD
 		// if a player gets hit with trainer-no_pwrdn enabled...
 		int drop = fmax(2, (total_power * 0.15) / POWER_VALUE);
+=======
+		// if "no powerdown" trainer is DISABLED, then powerdown as usual
+		int drop = max(2, (total_power * 0.15) / POWER_VALUE);
+>>>>>>> 84bc4d70... changes as requested in PR
 		spawn_items(plr->deathpos, ITEM_POWER, drop);
 		player_set_power(plr, total_power * 0.7);
 		plr->voltage *= 0.9;
-		log_debug("Trainer Mode - No Powerdown");
+	} else {
+		// log when "no powerdown" trainer used
+		log_debug("Trainer Mode - No Powerdown Used");
 	}
 
 	plr->bombs = PLR_START_BOMBS;
 	plr->bomb_fragments = 0;
 
 	if (trainer_lives_enabled() && plr->lives < 1) {
-		trainer_append_life_event(&global.tnr);
+		trainer_append_life_event(&global.trainer);
 	} else {
 		plr->voltage *= 0.9;
 		plr->lives--;
@@ -964,7 +984,7 @@ void player_death(Player *plr) {
 	}
 
 	if (trainer_invulnerable_enabled()) {
-		trainer_append_hit_event(&global.tnr);
+		trainer_append_hit_event(&global.trainer);
 		play_sound("shot3");
 		return;
 	}
