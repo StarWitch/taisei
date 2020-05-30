@@ -134,13 +134,12 @@ typedef struct ReplayStage {
 	/* END REPLAY_STRUCT_VERSION_TS102000_REV3 and above */
 
 	/* BEGIN REPLAY_STRUCT_VERSION_TS104000_REV0 and above */
-<<<<<<< HEAD
 	uint8_t plr_stats_total_lives_used;
 	uint8_t plr_stats_stage_lives_used;
 	uint8_t plr_stats_total_bombs_used;
 	uint8_t plr_stats_stage_bombs_used;
 	uint8_t plr_stats_stage_continues_used;
-=======
+
 	// trainer mode
 	bool plr_trainer_enabled;
 	bool plr_trainer_invulnerable;
@@ -157,7 +156,7 @@ typedef struct ReplayStage {
 	uint16_t plr_trainer_stage_lives;
 	uint16_t plr_trainer_stage_bombs;
 	uint16_t plr_trainer_stage_hits;
->>>>>>> 740e4b9a... made this entire concept make more sense - also now works with replays
+
 	/* END REPLAY_STRUCT_VERSION_TS104000_REV0 and above */
 
 	// player input

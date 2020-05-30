@@ -236,13 +236,12 @@ static uint32_t replay_calc_stageinfo_checksum(ReplayStage *stg, uint16_t versio
 	}
 
 	if(version >= REPLAY_STRUCT_VERSION_TS104000_REV0) {
-<<<<<<< HEAD
 		cs += stg->plr_stats_total_lives_used;
 		cs += stg->plr_stats_stage_lives_used;
 		cs += stg->plr_stats_total_bombs_used;
 		cs += stg->plr_stats_stage_bombs_used;
 		cs += stg->plr_stats_stage_continues_used;
-=======
+
 		cs += stg->plr_trainer_enabled;
 		cs += stg->plr_trainer_stats;
 		cs += stg->plr_trainer_invulnerable;
@@ -258,7 +257,6 @@ static uint32_t replay_calc_stageinfo_checksum(ReplayStage *stg, uint16_t versio
 		cs += stg->plr_trainer_total_bombs;
 		cs += stg->plr_trainer_total_bombs;
 		cs += stg->plr_trainer_total_hits;
->>>>>>> 740e4b9a... made this entire concept make more sense - also now works with replays
 	}
 
 	log_debug("%08x", cs);
@@ -295,13 +293,13 @@ static bool replay_write_stage(ReplayStage *stg, SDL_RWops *file, uint16_t versi
 	}
 
 	if(version >= REPLAY_STRUCT_VERSION_TS104000_REV0) {
-<<<<<<< HEAD
+
 		SDL_WriteU8(file, stg->plr_stats_total_lives_used);
 		SDL_WriteU8(file, stg->plr_stats_stage_lives_used);
 		SDL_WriteU8(file, stg->plr_stats_total_bombs_used);
 		SDL_WriteU8(file, stg->plr_stats_stage_bombs_used);
 		SDL_WriteU8(file, stg->plr_stats_stage_continues_used);
-=======
+
 		SDL_WriteU8(file, stg->plr_trainer_enabled);
 		SDL_WriteU8(file, stg->plr_trainer_stats);
 		SDL_WriteU8(file, stg->plr_trainer_invulnerable);
@@ -317,7 +315,6 @@ static bool replay_write_stage(ReplayStage *stg, SDL_RWops *file, uint16_t versi
 		SDL_WriteLE16(file, stg->plr_trainer_stage_lives);
 		SDL_WriteLE16(file, stg->plr_trainer_stage_bombs);
 		SDL_WriteLE16(file, stg->plr_trainer_stage_hits);
->>>>>>> 740e4b9a... made this entire concept make more sense - also now works with replays
 	}
 
 	if(stg->events.num_elements > UINT16_MAX) {
@@ -582,13 +579,12 @@ static bool _replay_read_meta(Replay *rpy, SDL_RWops *file, int64_t filesize, co
 		}
 
 		if(version >= REPLAY_STRUCT_VERSION_TS104000_REV0) {
-<<<<<<< HEAD
 			CHECKPROP(stg->plr_stats_total_lives_used = SDL_ReadU8(file), u);
 			CHECKPROP(stg->plr_stats_stage_lives_used = SDL_ReadU8(file), u);
 			CHECKPROP(stg->plr_stats_total_bombs_used = SDL_ReadU8(file), u);
 			CHECKPROP(stg->plr_stats_stage_bombs_used = SDL_ReadU8(file), u);
 			CHECKPROP(stg->plr_stats_stage_continues_used = SDL_ReadU8(file), u);
-=======
+
 			CHECKPROP(stg->plr_trainer_enabled = SDL_ReadU8(file), u);
 			CHECKPROP(stg->plr_trainer_stats = SDL_ReadU8(file), u);
 			CHECKPROP(stg->plr_trainer_invulnerable = SDL_ReadU8(file), u);
@@ -604,7 +600,7 @@ static bool _replay_read_meta(Replay *rpy, SDL_RWops *file, int64_t filesize, co
 			CHECKPROP(stg->plr_trainer_total_bombs = SDL_ReadLE16(file), u);
 			CHECKPROP(stg->plr_trainer_total_bombs = SDL_ReadLE16(file), u);
 			CHECKPROP(stg->plr_trainer_total_hits = SDL_ReadLE16(file), u);
->>>>>>> 740e4b9a... made this entire concept make more sense - also now works with replays
+
 		}
 
 		CHECKPROP(stg->num_events = SDL_ReadLE16(file), u);
