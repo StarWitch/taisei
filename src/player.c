@@ -42,7 +42,6 @@ void player_init(Player *plr) {
 	plr->deathtime = -1;
 	plr->continuetime = -1;
 	plr->mode = plrmode_find(0, 0);
-
 }
 
 void player_stage_pre_init(Player *plr) {
@@ -235,7 +234,7 @@ static void ent_draw_player(EntityInterface *ent) {
 		return;
 	}
 
-	if(plr->focus_circle_alpha || trainer_focus_dot_enabled()) {
+	if(plr->focus_circle_alpha || plr->trainer.settings.dot) {
 		r_draw_sprite(&(SpriteParams) {
 			.sprite = "fairy_circle",
 			.rotation.angle = DEG2RAD * global.frames * 10,
@@ -623,19 +622,6 @@ DEFINE_TASK(player_logic) {
 }
 
 static bool player_can_bomb(Player *plr) {
-	return (
-		!player_is_bomb_active(plr)
-		&& (
-			plr->bombs > 0 ||
-			plr->iddqd ||
-			trainer_bombs_enabled()
-		)
-		&& global.frames >= plr->respawntime
-	);
-
-}
-
-static bool player_can_bomb(Player *plr) {
 	// this function checks a bunch of conditions to see if the player is capable of bombing
 	// 1. isn't currently using a bomb
 	// 2. has enough bombs OR Developer God Mode enabled OR Trainer Invulnerability enabled
@@ -646,7 +632,7 @@ static bool player_can_bomb(Player *plr) {
 		&& (
 				plr->bombs > 0 ||
 				plr->iddqd ||
-				trainer_bombs_enabled()
+				plr->trainer.settings.extra_bombs
 			)
 		&& global.frames >= plr->respawntime
 	);
@@ -684,8 +670,8 @@ static bool player_bomb(Player *plr) {
 		}
 
 		if(plr->bombs < 0) {
-			if (trainer_bombs_enabled()) {
-				trainer_append_bomb_event(&global.trainer);
+			if (plr->trainer.settings.extra_bombs) {
+				trainer_append_bomb_event(&plr->trainer);
 			}
 			plr->bombs = 0;
 		}
@@ -893,14 +879,9 @@ void player_realdeath(Player *plr) {
 
 	int total_power = plr->power + plr->power_overflow;
 
-	if (!trainer_no_powerdown_enabled()) {
-<<<<<<< HEAD
-		// if a player gets hit with trainer-no_pwrdn enabled...
-		int drop = fmax(2, (total_power * 0.15) / POWER_VALUE);
-=======
+	if (!plr->trainer.settings.no_powerdown) {
 		// if "no powerdown" trainer is DISABLED, then powerdown as usual
-		int drop = max(2, (total_power * 0.15) / POWER_VALUE);
->>>>>>> 84bc4d70... changes as requested in PR
+		int drop = fmax(2, (total_power * 0.15) / POWER_VALUE);
 		spawn_items(plr->deathpos, ITEM_POWER, drop);
 		player_set_power(plr, total_power * 0.7);
 		plr->voltage *= 0.9;
@@ -911,8 +892,8 @@ void player_realdeath(Player *plr) {
 	plr->bombs = PLR_START_BOMBS;
 	plr->bomb_fragments = 0;
 
-	if (trainer_lives_enabled() && plr->lives < 1) {
-		trainer_append_life_event(&global.trainer);
+	if (plr->trainer.settings.extra_lives && plr->lives < 1) {
+		trainer_append_life_event(&plr->trainer);
 	} else {
 		plr->voltage *= 0.9;
 		plr->lives--;
@@ -990,8 +971,8 @@ void player_death(Player *plr) {
 		return;
 	}
 
-	if (trainer_invulnerable_enabled()) {
-		trainer_append_hit_event(&global.trainer);
+	if (plr->trainer.settings.invulnerable) {
+		trainer_append_hit_event(&plr->trainer);
 		play_sound("tick");
 		return;
 	}

@@ -92,7 +92,7 @@ static void reset_game(StartGameContext *ctx) {
 	replay_init(&global.replay);
 	player_init(&global.plr);
 	stats_init(&global.plr.stats);
-	trainer_init(&global.trainer);
+	trainer_init(&global.plr.trainer);
 	global.plr.mode = plrmode_find(
 		progress.game_settings.character,
 		progress.game_settings.shotmode
