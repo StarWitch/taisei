@@ -11,6 +11,7 @@
 #include "player.h"
 
 #include "projectile.h"
+#include "trainer.h"
 #include "global.h"
 #include "plrmodes.h"
 #include "stage.h"
@@ -41,6 +42,7 @@ void player_init(Player *plr) {
 	plr->deathtime = -1;
 	plr->continuetime = -1;
 	plr->mode = plrmode_find(0, 0);
+
 }
 
 void player_stage_pre_init(Player *plr) {
@@ -623,7 +625,8 @@ static bool player_can_bomb(Player *plr) {
 		!player_is_bomb_active(plr)
 		&& (
 			plr->bombs > 0 ||
-			plr->iddqd
+			plr->iddqd ||
+			trainer_bombs_enabled()
 		)
 		&& global.frames >= plr->respawntime
 	);
@@ -660,6 +663,9 @@ static bool player_bomb(Player *plr) {
 		}
 
 		if(plr->bombs < 0) {
+			if (trainer_bombs_enabled()) {
+				trainer_append_bomb_event(&global.tnr);
+			}
 			plr->bombs = 0;
 		}
 
@@ -866,15 +872,25 @@ void player_realdeath(Player *plr) {
 
 	int total_power = plr->power + plr->power_overflow;
 
-	int drop = fmax(2, (total_power * 0.15) / POWER_VALUE);
-	spawn_items(plr->deathpos, ITEM_POWER, drop);
+	if (!trainer_no_powerdown_enabled()) {
+		// if a player gets hit with trainer-no_pwrdn enabled...
+		int drop = fmax(2, (total_power * 0.15) / POWER_VALUE);
+		spawn_items(plr->deathpos, ITEM_POWER, drop);
+		player_set_power(plr, total_power * 0.7);
+		plr->voltage *= 0.9;
+		log_debug("Trainer Mode - No Powerdown");
+	}
 
-	player_set_power(plr, total_power * 0.7);
 	plr->bombs = PLR_START_BOMBS;
 	plr->bomb_fragments = 0;
-	plr->voltage *= 0.9;
-	plr->lives--;
-	stats_track_life_used(&plr->stats);
+
+	if (trainer_lives_enabled() && plr->lives < 1) {
+		trainer_append_life_event(&global.tnr);
+	} else {
+		plr->voltage *= 0.9;
+		plr->lives--;
+		stats_track_life_used(&plr->stats);
+	}
 }
 
 static void player_death_effect_draw_overlay(Projectile *p, int t, ProjDrawRuleArgs args) {
@@ -944,6 +960,12 @@ static int player_death_effect(Projectile *p, int t) {
 
 void player_death(Player *plr) {
 	if(!player_is_vulnerable(plr) || stage_is_cleared()) {
+		return;
+	}
+
+	if (trainer_invulnerable_enabled()) {
+		trainer_append_hit_event(&global.tnr);
+		play_sound("shot3");
 		return;
 	}
 

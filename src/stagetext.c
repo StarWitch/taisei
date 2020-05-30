@@ -187,7 +187,6 @@ void stagetext_table_add_separator(StageTextTable *tbl) {
 	tbl->pos += I * 0.5 * font_get_lineskip(get_font("standard"));
 }
 
-
 StageText *stagetext_list_head(void) {
 	return textlist;
 }

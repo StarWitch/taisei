@@ -48,6 +48,7 @@
 #include "framerate.h"
 #include "renderer/api.h"
 #include "stageinfo.h"
+#include "trainer.h"
 
 enum {
 	// defaults
@@ -132,6 +133,8 @@ typedef struct {
 	RandomState rand_visual;
 
 	StageInfo *stage;
+
+	Trainer tnr;
 
 	uint is_practice_mode : 1;
 	uint is_headless : 1;
