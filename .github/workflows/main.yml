@@ -1,0 +1,82 @@
+name: taisei-build-test
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "**.c"
+      - "**.h"
+      - "**.yml"
+      - "**.yaml"
+  pull_request:
+    paths:
+      - "**.c"
+      - "**.h"
+      - "**.yml"
+      - "**.yaml"
+
+jobs:
+  linux:
+    runs-on: ubuntu-20.04 # so we're not using ancient tools
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Checkout Submodules
+      run: git submodule update --init --recursive
+
+    - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    # needed because apt version is too old
+    - name: Install Build Tools (pip)
+      run: pip install meson ninja
+
+    - name: Install Build Tools (apt)
+      run: sudo apt install cmake build-essential libsdl2-dev libsdl2-mixer-dev libogg-dev libopusfile-dev libpng-dev libzip-dev libx11-dev libwayland-dev imagemagick python3-docutils libwebp-dev
+
+    - name: Configure (Meson)
+      run: meson setup build/ -Dinstall_relative=true -Dbuildtype=debug -Db_ndebug=false -Db_lto=false -Dstrip=false -Ddeveloper=true
+
+    - name: Build (Ninja)
+      run: meson test -C build/ -v
+
+    - name: Upload Log
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: taisei_linux_fail_log
+        path: build/meson-logs/meson-log.txt
+
+  macos:
+    runs-on: macos-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Checkout Submodules
+      run: git submodule update --init --recursive
+
+    - name: Set Up Build Environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Build Tools (brew)
+      run: brew install gcc meson cmake pkg-config docutils imagemagick pygments freetype2 libzip opusfile libvorbis webp sdl2 ninja
+
+    - name: Configure (Meson)
+      run: meson setup build/ -Dinstall_relative=true -Dbuildtype=debug -Db_ndebug=false -Db_lto=false -Dstrip=false -Ddeveloper=true
+
+    - name: Build (Ninja)
+      run: meson test -C build/ -v
+
+    - name: Upload Log
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: taisei_macos_fail_log
+        path: build/meson-logs/meson-log.txt
