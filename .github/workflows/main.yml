@@ -34,10 +34,10 @@ jobs:
         python-version: '3.x'
 
     - name: Install Build Tools (apt)
-      run: sudo apt install meson ninja cmake build-essential libsdl2-dev libogg-dev libopusfile-dev libpng-dev libzip-dev libx11-dev libwayland-dev imagemagick python3-docutils libwebp-dev
+      run: sudo apt install meson cmake build-essential libsdl2-dev libogg-dev libopusfile-dev libpng-dev libzip-dev libx11-dev libwayland-dev imagemagick python3-docutils libwebp-dev
 
     - name: Configure (Meson)
-      run: meson setup --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false
+      run: meson setup --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Dwerror=true -Ddeprecation_warnings=ignore
 
     - name: Build (Ninja)
       run: meson test -C build/ -v
@@ -67,7 +67,7 @@ jobs:
       run: brew install gcc meson cmake pkg-config docutils imagemagick pygments freetype2 libzip opusfile libvorbis webp sdl2 ninja
 
     - name: Configure (Meson)
-      run: meson setup --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false
+      run: meson setup --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Dwerror=true -Ddeprecation_warnings=ignore
 
     - name: Build (Ninja)
       run: meson test -C build/ -v
