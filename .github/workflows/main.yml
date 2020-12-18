@@ -20,7 +20,7 @@ on:
 
 jobs:
   linux-test-build:
-    runs-on: ubuntu-20.04 # so we're not using ancient tools
+    runs-on: ubuntu-18.04
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -33,14 +33,20 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install Build Tools (apt)
-      run: sudo apt install meson cmake build-essential libsdl2-dev libogg-dev libopusfile-dev libpng-dev libzip-dev libx11-dev libwayland-dev imagemagick python3-docutils libwebp-dev
+    - name: Install Meson/Ninja (Pip)
+      run: pip install meson ninja
 
-    - name: Configure (Meson)
-      run: meson setup --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Ddeprecation_warnings=ignore
+    - name: Install Build Tools (apt)
+      run: sudo apt install meson build-essential libsdl2-dev libogg-dev libopusfile-dev libpng-dev libzip-dev libx11-dev libwayland-dev python3-docutils libwebp-dev
+
+    - name: Configure - Step 1 (Meson)
+      run: meson setup --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Ddeprecation_warnings=no-error
+
+    - name: Configure - Step 2 (Meson)
+      run: meson configure build/ -Dwerror=true
 
     - name: Build (Ninja)
-      run: meson test -C build/ -v
+      run: meson compile -C build/
 
     - name: Upload Log
       uses: actions/upload-artifact@v2
@@ -64,13 +70,16 @@ jobs:
         python-version: '3.x'
 
     - name: Install Build Tools (brew)
-      run: brew install gcc meson cmake pkg-config docutils imagemagick pygments freetype2 libzip opusfile libvorbis webp sdl2 ninja
+      run: brew install gcc meson pkg-config docutils pygments freetype2 libzip opusfile libvorbis webp sdl2 ninja
 
-    - name: Configure (Meson)
-      run: meson setup --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Ddeprecation_warnings=ignore
+    - name: Configure - Step 1 (Meson)
+      run: meson setup --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Ddeprecation_warnings=no-error
+
+    - name: Configure - Step 2 (Meson)
+      run: meson configure build/ -Dwerror=true
 
     - name: Build (Ninja)
-      run: meson test -C build/ -v
+      run: meson compile -C build/
 
     - name: Upload Log
       uses: actions/upload-artifact@v2
