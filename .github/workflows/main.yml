@@ -51,7 +51,7 @@ jobs:
       run: meson install -C build/
 
     - name: Run - Step 4 (Taisei)
-      run: $(pwd)/build-test/bin/taisei -R resources/test-replay.tsr
+      run: $(pwd)/build-test/bin/taisei -R $(pwd)/resources/test-replay.tsr
       env:
         TAISEI_NOPRELOAD: 0
         TAISEI_PRELOAD_REQUIRED: 1
@@ -90,7 +90,7 @@ jobs:
       run: meson install -C build/
 
     - name: Run - Step 4 (Taisei)
-      run: $(pwd)/build-test/Taisei.app/Contents/MacOS/Taisei -R resources/test-replay.tsr
+      run: $(pwd)/build-test/Taisei.app/Contents/MacOS/Taisei -R $(pwd)/resources/test-replay.tsr
 
       env:
         TAISEI_NOPRELOAD: 0
@@ -134,7 +134,7 @@ jobs:
       run: meson install -C build/
 
     - name: Run - Step 4 (Taisei)
-      run: $(pwd)/build-test/bin/taisei -R resources/test-replay.tsr
+      run: $(pwd)/build-test/bin/taisei -R $(pwd)/resources/test-replay.tsr
       env:
         TAISEI_NOPRELOAD: 0
         TAISEI_PRELOAD_REQUIRED: 1
