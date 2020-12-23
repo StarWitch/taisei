@@ -91,7 +91,6 @@ jobs:
 
     - name: Run - Step 4 (Taisei)
       run: $(pwd)/build-test/Taisei.app/Contents/MacOS/Taisei -R $(pwd)/resources/test-replay.tsr
-
       env:
         TAISEI_NOPRELOAD: 0
         TAISEI_PRELOAD_REQUIRED: 1
