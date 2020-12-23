@@ -42,7 +42,7 @@ jobs:
       run: sudo apt install build-essential libsdl2-dev libogg-dev libopusfile-dev libpng-dev libzip-dev libx11-dev libwayland-dev python3-docutils libwebp-dev libfreetype6-dev
 
     - name: Configure - Step 1 (Meson)
-      run: meson setup --prefix=$(pwd)/build-test --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Ddeprecation_warnings=no-error
+      run: meson setup --prefix=$(pwd)/build-test --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Ddeprecation_warnings=no-error -Dwerror=true -Db_pch=false
 
     - name: Build - Step 2 (Ninja)
       run: meson compile -C build/
@@ -81,7 +81,7 @@ jobs:
       run: brew install gcc meson pkg-config docutils pygments freetype2 libzip opusfile libvorbis webp sdl2 ninja
 
     - name: Configure - Step 1 (Meson)
-      run: meson setup --prefix=$(pwd)/build-test --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Ddeprecation_warnings=no-error
+      run: meson setup --prefix=$(pwd)/build-test --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Ddeprecation_warnings=no-error -Dwerror=true -Db_pch=false
 
     - name: Build - Step 2 (Ninja)
       run: meson compile -C build/
@@ -100,47 +100,4 @@ jobs:
       if: failure()
       with:
         name: taisei_macos_fail_log
-        path: build/meson-logs/meson-log.txt
-
-  strict-test-build:
-    runs-on: ubuntu-18.04
-    if: github.ref == 'refs/heads/master' # only run strict builds on `master`
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
-
-    - name: Checkout Submodules
-      run: git submodule update --init --recursive
-
-    - name: Install Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-
-    - name: Install Meson/Ninja (Pip)
-      run: pip install meson ninja
-
-    - name: Install Build Tools (apt)
-      run: sudo apt install meson build-essential libsdl2-dev libogg-dev libopusfile-dev libpng-dev libzip-dev libx11-dev libwayland-dev python3-docutils libwebp-dev libfreetype6-dev
-
-    - name: Configure - Step 1 (Meson)
-      run: meson setup --prefix=$(pwd)/build-test --wrap-mode=nofallback build/ -Db_lto=false -Dstrip=false -Ddeprecation_warnings=no-error -Dwerror=true # -Dwerror=true is strict builds
-
-    - name: Build - Step 2 (Ninja)
-      run: meson compile -C build/
-
-    - name: Install - Step 3 (Meson)
-      run: meson install -C build/
-
-    - name: Run - Step 4 (Taisei)
-      run: $(pwd)/build-test/bin/taisei -R $(pwd)/resources/test-replay.tsr
-      env:
-        TAISEI_NOPRELOAD: 0
-        TAISEI_PRELOAD_REQUIRED: 1
-
-    - name: Upload Log
-      uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: taisei_strict_fail_log
         path: build/meson-logs/meson-log.txt
