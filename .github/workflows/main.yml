@@ -23,6 +23,7 @@ on:
 jobs:
   linux-test-build:
     runs-on: ubuntu-18.04
+	if: "!contains(github.event.head_commit.message, 'skip tests')" # if "skip tests" exists in the commit message
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -65,6 +66,7 @@ jobs:
 
   macos-test-build:
     runs-on: macos-10.15
+	if: "!contains(github.event.head_commit.message, 'skip tests')"
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
