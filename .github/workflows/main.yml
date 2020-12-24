@@ -1,5 +1,4 @@
 name: taisei-build-tests
-
 on:
   push:
     branches:
