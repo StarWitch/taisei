@@ -85,7 +85,7 @@ TASK(spinshot_fairy_attack, {
 
 	for(int t = 0; t < ARGS.activate_time; ++t, YIELD) {
 		int live_count = 0;
-		e = NOT_NULL(ENT_UNBOX(ARGS.e));
+		e = ENT_UNBOX(ARGS.e);
 
 		if(e) {
 			ref_pos = e->pos;
