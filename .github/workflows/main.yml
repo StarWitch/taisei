@@ -1,4 +1,4 @@
-name: taisei-build-test
+name: taisei-build-tests
 
 on:
   push:
