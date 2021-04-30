@@ -1,0 +1,8 @@
+## 2021-04-28
+### Added
+* Standard markdown file.
+* Change sections for release notes.
+
+For a list of all commits since the last release, [click here].
+
+[click here]: https://github.com/StarWitch/taisei/compare/v1.3.2...v1.4.0

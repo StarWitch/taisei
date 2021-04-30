@@ -1,0 +1,67 @@
+name: taisei-publish
+
+# manual run only for publishing
+on:
+  workflow_dispatch:
+    inputs:
+      draftRelease:
+        description: "Is this a 'draft' release? (MUST ANSWER EITHER 'true' OR 'false' AS STRING INPUT)"
+        required: true
+        default: "false"
+      preRelease:
+        description: "Is this a 'prerelease'? (MUST ANSWER EITHER 'true' OR 'false' AS STRING INPUT)"
+        required: true
+        default: "false"
+      tag:
+        required: true
+        description: "Release tag to publish. (i.e: v1.4.0)"
+        default: "v1.x.x"
+    tags:
+      - v*.*.*
+      - testing/v*.*.*
+      - rc/v*.*.*
+
+jobs:
+  taisei-release:
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          ref: refs/tags/${{ github.event.inputs.tag }}
+
+      - name: Set Env
+        run: echo "taisei_version=$(echo '${{ github.event.inputs.tag }}' | sed 's/^v//g')" >> $GITHUB_ENV
+
+      - name: Download Taisei Builds
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: release.yml
+          workflow_conclusion: success
+          path: /opt
+
+      - name: Create SHA256Sums
+        run: |
+          sha256sum /opt/linux-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz > /opt/linux-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz.sha256
+          sha256sum /opt/macos-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg > /opt/macos-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg.sha256
+          sha256sum /opt/windows-x86_64-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86_64.exe > /opt/windows-x86_64-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86_64.exe.sha256
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          draft: ${{ github.event.inputs.draftRelease }}
+          prerelease: ${{ github.event.inputs.preRelease }}
+          body_path: changelogs/changelog-${{ github.event.inputs.tag }}.txt
+          name: ${{ github.event.inputs.tag }}
+          tag_name: ${{ github.event.inputs.tag }}
+          files: |
+            /opt/linux-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz
+            /opt/linux-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz.sha256
+            /opt/macos-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg
+            /opt/macos-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg.sha256
+            /opt/windows-x86_64-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86_64.exe
+            /opt/windows-x86_64-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86_64.exe.sha256
+            /opt/linux-x86_64-${{ env.taisei_version}}/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz

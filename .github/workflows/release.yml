@@ -1,0 +1,235 @@
+name: taisei-build-releases
+on:
+  push:
+    branches:
+      - rc/v*.*.*
+      - testing/v*.*.*
+    tags:
+      - v*.*.*
+      - testing/v*.*.*
+      - rc/v*.*.*
+
+jobs:
+  linux-release:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Build Tools (apt)
+      run: |
+        sudo apt update
+        sudo apt install -y -qq \
+        build-essential \
+        libsdl2-dev \
+        libx11-dev \
+        libwayland-dev \
+        python3-docutils
+        # pip
+        pip install \
+        meson==0.55.3 \
+        ninja \
+        zstandard
+
+    # - name: Set Build Tag
+    #   if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    #   run: echo "Hi!"
+
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Set Tag Output
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
+
+    - name: Configure (Meson)
+      run: |
+        meson setup build/linux \
+          --prefix=$(pwd)/build-release \
+          --native-file ci/linux-x86_64-build-release.ini
+
+    - name: Build & Install
+      run: |
+        meson compile -C build/linux --verbose
+        meson install -C build/linux
+
+    - name: Run Test (Taisei)
+      run: $(pwd)/build-release/bin/taisei -R $(pwd)/misc/tests/test-replay.tsr
+      env:
+        TAISEI_NOPRELOAD: 0
+        TAISEI_PRELOAD_REQUIRED: 1
+
+    - name: Build Package
+      run: meson compile txz -C build/linux --verbose
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      if: success()
+      with:
+        name: linux-x86_64-${{ steps.vars.outputs.tag }}
+        path: build/linux/Taisei-${{ steps.vars.outputs.tag }}-linux-x86_64.tar.xz
+        if-no-files-found: error
+
+    - name: Upload Log
+      uses: actions/upload-artifact@v2
+      with:
+        name: taisei_linux_release
+        path: build/linux/meson-logs/meson-log.txt
+        if-no-files-found: warn
+
+  macos-release:
+    runs-on: macos-10.15
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        submodules: "recursive"
+
+    - name: Set Up Build Environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Build Tools
+      run: |
+        brew install \
+        gcc \
+        pkg-config \
+        docutils \
+        pygments \
+        create-dmg
+        # pip
+        pip install \
+        meson==0.55.3 \
+        ninja \
+        zstandard
+
+    - name: Set Build Tag
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
+
+    - name: Configure (Meson)
+      run: |
+        meson setup build/macos \
+          --prefix=$(pwd)/build-release \
+          --native-file ci/macos-x86_64-build-release.ini
+
+    - name: Build & Install
+      run: |
+        meson compile -C build/macos --verbose
+        meson install -C build/macos
+
+    - name: Run Test (Taisei)
+      run: $(pwd)/build-release/Taisei.app/Contents/MacOS/Taisei -R $(pwd)/misc/tests/test-replay.tsr
+      env:
+        TAISEI_NOPRELOAD: 0
+        TAISEI_PRELOAD_REQUIRED: 1
+
+    - name: Build Package
+      run: meson compile dmg -C build/macos --verbose
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      if: success()
+      with:
+        name: macos-x86_64-${{ steps.vars.outputs.tag }}
+        path: build/macos/Taisei-${{ steps.vars.outputs.tag }}-macOS-x86_64.dmg
+        if-no-files-found: error
+
+    - name: Upload Log
+      uses: actions/upload-artifact@v2
+      with:
+        name: taisei_macos_release
+        path: build/macos/meson-logs/meson-log.txt
+        if-no-files-found: warn
+
+  windows-release:
+    runs-on: ubuntu-20.04
+    container: mstorsjo/llvm-mingw:20210423 # cross-compiler with mingw
+    steps:
+    - name: Install tools (Apt)
+      run: |
+        apt update
+        apt install -y -qq software-properties-common
+        add-apt-repository ppa:git-core/ppa -y
+        apt install -y -qq \
+        python3-docutils \
+        python3-pip \
+        git \
+        wget \
+        nsis
+        # pip
+        pip3 install \
+        meson==0.55.3 \
+        ninja \
+        zstandard
+
+    # install 3.x on top of older Ubuntu
+    # 3.x is only available for 20.04+, so --force-all the install (it still works but complains about libc versions)
+    - name: Install NSIS 3.x
+      run: |
+        wget http://security.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis-pluginapi_3.05-2_all.deb -P /tmp
+        wget http://security.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis-common_3.05-2_all.deb -P /tmp
+        wget http://security.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis_3.05-2_amd64.deb -P /tmp
+        dpkg -i --force-all /tmp/nsis-common_3.05-2_all.deb /tmp/nsis_3.05-2_amd64.deb /tmp/nsis-pluginapi_3.05-2_all.deb
+
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        submodules: "recursive"
+
+    - name: Set Build Tag
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
+
+    - name: Configure Taisei (Meson)
+      run: |
+        meson setup build/windows \
+          --prefix=$(pwd)/build-release \
+          --cross-file ci/windows-llvm_mingw-x86_64-build-release.ini
+      env:
+        LIBEGL: $(pwd)/misc/angle-dll/libEGL.dll
+        LIBGLES: $(pwd)/misc/angle-dll/libGLESv2.dll
+        # TODO: take these from a submodule instead
+
+    - name: Build (Package EXE)
+      run: meson compile nsis -C build/windows --verbose
+      env:
+        LIBEGL: $(pwd)/misc/angle-dll/libEGL.dll
+        LIBGLES: $(pwd)/misc/angle-dll/libGLESv2.dll
+        # TODO: take these from a submodule instead
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      if: success()
+      with:
+        name: windows-x86_64-${{ steps.vars.outputs.tag }}-setup-exe
+        path: build/windows/Taisei-${{ steps.vars.outputs.tag }}-setup-x86_64.exe
+        if-no-files-found: error
+
+    # TODO: fix zip creation
+    # - name: Build (Package ZIP)
+    #   run: meson compile zip -C build/ --verbose
+    #   env:
+    #     LIBEGL: $(pwd)/misc/angle-dll/libEGL.dll
+    #     LIBGLES: $(pwd)/misc/angle-dll/libGLESv2.dll
+    #     # TODO: take these from a submodule instead
+
+    # - name: Upload Artifact (ZIP)
+    #   uses: actions/upload-artifact@v2
+    #   if: success()
+    #   with:
+    #     name: Taisei-${{ steps.vars.outputs.tag }}-windows-x86_64.zip
+    #     path: build/Taisei-${{ steps.vars.outputs.tag }}-windows-x86_64.zip
+    #     if-no-files-found: error
+
+    - name: Upload Log
+      uses: actions/upload-artifact@v2
+      with:
+        name: taisei_windows_release
+        path: build/windows/meson-logs/meson-log.txt
+        if-no-files-found: warn
