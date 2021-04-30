@@ -45,7 +45,10 @@ jobs:
         run: |
           sha256sum /opt/linux-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz > /opt/linux-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz.sha256
           sha256sum /opt/macos-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg > /opt/macos-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg.sha256
+          sha256sum /opt/windows-x86_64-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86_64.zip > /opt/windows-x86_64-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86_64.zip.sha256
           sha256sum /opt/windows-x86_64-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86_64.exe > /opt/windows-x86_64-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86_64.exe.sha256
+          sha256sum /opt/windows-x86-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86.zip > /opt/windows-x86-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86.zip.sha256
+          sha256sum /opt/windows-x86-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86.exe > /opt/windows-x86-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86.exe.sha256
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -64,4 +67,9 @@ jobs:
             /opt/macos-x86_64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg.sha256
             /opt/windows-x86_64-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86_64.exe
             /opt/windows-x86_64-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86_64.exe.sha256
-            /opt/linux-x86_64-${{ env.taisei_version}}/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz
+            /opt/windows-x86_64-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86_64.zip
+            /opt/windows-x86_64-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86_64.zip.sha256
+            /opt/windows-x86-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86.exe
+            /opt/windows-x86-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86.exe.sha256
+            /opt/windows-x86-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86.zip
+            /opt/windows-x86-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86.zip.sha256
