@@ -148,8 +148,8 @@ jobs:
         if-no-files-found: warn
 
   macos-release-arm64:
-    # arm64 requires macOS 11.0
-    runs-on: macos-11.0
+    # change this to macos-11.0 when github releases it
+    runs-on: macos-10.15
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -273,7 +273,7 @@ jobs:
         if-no-files-found: error
 
     - name: Build (Package ZIP x64)
-      run: ninja zip -C build/ --verbose
+      run: ninja zip -C build/windows --verbose
       env:
         LIBEGL: $(pwd)/misc/angle-dll/libEGL.dll
         LIBGLES: $(pwd)/misc/angle-dll/libGLESv2.dll
@@ -284,7 +284,7 @@ jobs:
       if: success()
       with:
         name: windows-x86_64-${{ steps.vars.outputs.tag }}-zip
-        path: build/Taisei-${{ steps.vars.outputs.tag }}-windows-x86_64.zip
+        path: build/windows/Taisei-${{ steps.vars.outputs.tag }}-windows-x86_64.zip
         if-no-files-found: error
 
     - name: Upload Log
@@ -359,7 +359,7 @@ jobs:
         if-no-files-found: error
 
     - name: Build (Package ZIP x86)
-      run: ninja zip -C build/ --verbose
+      run: ninja zip -C build/windows --verbose
       env:
         LIBEGL: $(pwd)/misc/angle-dll/libEGL.dll
         LIBGLES: $(pwd)/misc/angle-dll/libGLESv2.dll
@@ -370,7 +370,7 @@ jobs:
       if: success()
       with:
         name: windows-x86-${{ steps.vars.outputs.tag }}-zip
-        path: build/Taisei-${{ steps.vars.outputs.tag }}-windows-x86.zip
+        path: build/windows/Taisei-${{ steps.vars.outputs.tag }}-windows-x86.zip
         if-no-files-found: error
 
     - name: Upload Log
