@@ -261,7 +261,6 @@ jobs:
     - name: Build
       run: |
         source emsdk/emsdk_env.sh
-        # run twice due to a header race condition with SPIRV-Tools
         meson compile txz -C build/ --verbose || true
         meson compile txz -C build/ --verbose
 
