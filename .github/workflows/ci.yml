@@ -250,8 +250,11 @@ jobs:
       run: >
         meson setup build/
         --native-file ci/emscripten-build-test-ci.ini
-        -Dbuild.cpp_std=gnu++14
         --prefix=$(pwd)/build-test
+
+        meson configure
+        -Dbuild.cpp_std=gnu++14
+        build/
 
     - name: Build & Install
       run: |

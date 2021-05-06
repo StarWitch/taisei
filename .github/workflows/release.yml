@@ -11,6 +11,7 @@ on:
 
 jobs:
   linux-release:
+    name: "Linux Release Build (x86_64)"
     runs-on: ubuntu-18.04
     steps:
     - name: Install Python
@@ -19,18 +20,19 @@ jobs:
         python-version: '3.x'
 
     - name: Install Build Tools (apt)
-      run: |
+      run: >
         sudo apt update
-        sudo apt install -y -qq \
-        build-essential \
-        libsdl2-dev \
-        libx11-dev \
-        libwayland-dev \
+
+        sudo apt install -y -qq
+        build-essential
+        libsdl2-dev
+        libx11-dev
+        libwayland-dev
         python3-docutils
-        # pip
-        pip install \
-        meson==0.55.3 \
-        ninja \
+
+        pip install
+        meson==0.55.3
+        ninja
         zstandard
 
     # - name: Set Build Tag
@@ -47,10 +49,10 @@ jobs:
       run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
 
     - name: Configure (Meson)
-      run: |
-        meson setup build/linux \
-          --prefix=$(pwd)/build-release \
-          --native-file ci/linux-x86_64-build-release.ini
+      run: >
+        meson setup build/linux
+        --prefix=$(pwd)/build-release
+        --native-file ci/linux-x86_64-build-release.ini
 
     - name: Build & Install
       run: |
@@ -77,7 +79,7 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_linux_release
+        name: taisei_linux_release_log
         path: build/linux/meson-logs/meson-log.txt
         if-no-files-found: warn
 
@@ -96,17 +98,17 @@ jobs:
         python-version: '3.x'
 
     - name: Install Build Tools
-      run: |
-        brew install \
-        gcc \
-        pkg-config \
-        docutils \
-        pygments \
+      run: >
+        brew install
+        gcc
+        pkg-config
+        docutils
+        pygments
         create-dmg
-        # pip
-        pip install \
-        meson==0.55.3 \
-        ninja \
+
+        pip install
+        meson==0.55.3
+        ninja
         zstandard
 
     - name: Set Build Tag
@@ -114,10 +116,10 @@ jobs:
       run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
 
     - name: Configure (Meson)
-      run: |
-        meson setup build/macos \
-          --prefix=$(pwd)/build-release \
-          --native-file ci/macos-x86_64-build-release.ini
+      run: >
+        meson setup build/macos
+        --prefix=$(pwd)/build-release
+        --native-file ci/macos-x86_64-build-release.ini
 
     - name: Build & Install
       run: |
@@ -144,7 +146,7 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_macos_release
+        name: taisei_macos_intel_release_log
         path: build/macos/meson-logs/meson-log.txt
         if-no-files-found: warn
 
@@ -167,17 +169,17 @@ jobs:
         python-version: '3.x'
 
     - name: Install Build Tools
-      run: |
-        brew install \
-        gcc \
-        pkg-config \
-        docutils \
-        pygments \
+      run: >
+        brew install
+        gcc
+        pkg-config
+        docutils
+        pygments
         create-dmg
-        # pip
-        pip install \
-        meson==0.55.3 \
-        ninja \
+
+        pip install
+        meson==0.55.3
+        ninja
         zstandard
 
     - name: Set Build Tag
@@ -185,10 +187,10 @@ jobs:
       run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
 
     - name: Configure (Meson)
-      run: |
-        meson setup build/macos \
-          --prefix=$(pwd)/build-release \
-          --cross-file ci/macos-aarch64-build-release.ini
+      run: >
+        meson setup build/macos
+        --prefix=$(pwd)/build-release
+        --cross-file ci/macos-aarch64-build-release.ini
 
     - name: Build & Install
       run: |
@@ -209,7 +211,7 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_macos_release
+        name: taisei_macos_arm64_release_log
         path: build/macos/meson-logs/meson-log.txt
         if-no-files-found: warn
 
@@ -219,30 +221,39 @@ jobs:
     container: mstorsjo/llvm-mingw:20210423 # cross-compiler with mingw
     steps:
     - name: Install tools (Apt)
-      run: |
+      run: >
         apt update
+
         apt install -y -qq software-properties-common
+
         add-apt-repository ppa:git-core/ppa -y
-        apt install -y -qq \
-        python3-docutils \
-        python3-pip \
-        git \
-        wget \
+
+        apt install -y -qq
+        python3-docutils
+        python3-pip
+        git
+        wget
         nsis
-        # pip
-        pip3 install \
-        meson==0.55.3 \
-        ninja \
+
+        pip3 install
+        meson==0.55.3
+        ninja
         zstandard
 
     # install 3.x on top of older Ubuntu
     # 3.x is only available for 20.04+, so --force-all the install (it still works but complains about libc versions)
     - name: Install NSIS 3.x
-      run: |
+      run: >
         wget http://security.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis-pluginapi_3.05-2_all.deb -P /tmp
+
         wget http://security.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis-common_3.05-2_all.deb -P /tmp
+
         wget http://security.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis_3.05-2_amd64.deb -P /tmp
-        dpkg -i --force-all /tmp/nsis-common_3.05-2_all.deb /tmp/nsis_3.05-2_amd64.deb /tmp/nsis-pluginapi_3.05-2_all.deb
+
+        dpkg -i --force-all
+        /tmp/nsis-common_3.05-2_all.deb
+        /tmp/nsis_3.05-2_amd64.deb
+        /tmp/nsis-pluginapi_3.05-2_all.deb
 
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -254,10 +265,10 @@ jobs:
       run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
 
     - name: Configure Taisei (Meson)
-      run: |
-        meson setup build/windows \
-          --prefix=$(pwd)/build-release \
-          --cross-file ci/windows-llvm_mingw-x86_64-build-release.ini
+      run: >
+        meson setup build/windows
+        --prefix=$(pwd)/build-release
+        --cross-file ci/windows-llvm_mingw-x86_64-build-release.ini
       env:
         LIBEGL: $(pwd)/misc/angle-dll/libEGL.dll
         LIBGLES: $(pwd)/misc/angle-dll/libGLESv2.dll
@@ -296,7 +307,7 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_windows_release
+        name: taisei_windows_x64_release_log
         path: build/windows/meson-logs/meson-log.txt
         if-no-files-found: warn
 
@@ -306,30 +317,39 @@ jobs:
     container: mstorsjo/llvm-mingw:20210423 # cross-compiler with mingw
     steps:
     - name: Install tools (Apt)
-      run: |
+      run: >
         apt update
+
         apt install -y -qq software-properties-common
+
         add-apt-repository ppa:git-core/ppa -y
-        apt install -y -qq \
-        python3-docutils \
-        python3-pip \
-        git \
-        wget \
+
+        apt install -y -qq
+        python3-docutils
+        python3-pip
+        git
+        wget
         nsis
-        # pip
-        pip3 install \
-        meson==0.55.3 \
-        ninja \
+
+        pip3 install
+        meson==0.55.3
+        ninja
         zstandard
 
     # install 3.x on top of older Ubuntu
     # 3.x is only available for 20.04+, so --force-all the install (it still works but complains about libc versions)
     - name: Install NSIS 3.x
-      run: |
+      run: >
         wget http://security.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis-pluginapi_3.05-2_all.deb -P /tmp
+
         wget http://security.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis-common_3.05-2_all.deb -P /tmp
+
         wget http://security.ubuntu.com/ubuntu/pool/universe/n/nsis/nsis_3.05-2_amd64.deb -P /tmp
-        dpkg -i --force-all /tmp/nsis-common_3.05-2_all.deb /tmp/nsis_3.05-2_amd64.deb /tmp/nsis-pluginapi_3.05-2_all.deb
+
+        dpkg -i --force-all
+        /tmp/nsis-common_3.05-2_all.deb
+        /tmp/nsis_3.05-2_amd64.deb
+        /tmp/nsis-pluginapi_3.05-2_all.deb
 
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -341,10 +361,10 @@ jobs:
       run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
 
     - name: Configure Taisei (Meson)
-      run: |
-        meson setup build/windows \
-          --prefix=$(pwd)/build-release \
-          --cross-file ci/windows-llvm_mingw-x86-build-release.ini
+      run: >
+        meson setup build/windows
+        --prefix=$(pwd)/build-release
+        --cross-file ci/windows-llvm_mingw-x86-build-release.ini
       env:
         LIBEGL: $(pwd)/misc/angle-dll/libEGL.dll
         LIBGLES: $(pwd)/misc/angle-dll/libGLESv2.dll
@@ -383,7 +403,7 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_windows_release
+        name: taisei_windows_x86_release_log
         path: build/windows/meson-logs/meson-log.txt
         if-no-files-found: warn
 
@@ -394,18 +414,21 @@ jobs:
     - name: Install tools (Apt)
       run: |
         apt update
+
         apt install -y -qq software-properties-common
+
         add-apt-repository ppa:git-core/ppa -y
-        apt install -y -qq \
-        python3-docutils \
-        python3-pip \
-        git \
-        wget \
+
+        apt install -y -qq
+        python3-docutils
+        python3-pip
+        git
+        wget
         nsis
-        # pip
-        pip3 install \
-        meson==0.55.3 \
-        ninja \
+
+        pip3 install
+        meson==0.55.3
+        ninja
         zstandard
 
     - name: Checkout Code
@@ -418,7 +441,7 @@ jobs:
       run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
 
     - name: Configure Taisei (Meson)
-      run: |
-        meson setup build/emscripten \
-          --prefix=$(pwd)/build-release \
-          --cross-file ci/emscripten-build-test-ci.ini
+      run: >
+        meson setup build/emscripten
+        --prefix=$(pwd)/build-release
+        --cross-file ci/emscripten-build-test-ci.ini
