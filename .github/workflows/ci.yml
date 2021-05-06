@@ -20,8 +20,15 @@ on:
       - "**.yaml"
       - "**.build"
 
+
+# TODO: upgrade from 2.0.19 when fixes are upstreamed
+env:
+  EM_VERSION: 2.0.19
+  EM_CACHE_FOLDER: 'emsdk-cache'
+
 jobs:
   linux-test-build:
+    name: "Linux CI Test Build"
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-20.04
     steps:
@@ -78,11 +85,12 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_linux_fail.log
+        name: taisei_linux_fail_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
 
   macos-test-build:
+    name: "macOS CI Test Build"
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: macos-10.15
     steps:
@@ -136,11 +144,12 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_macos_fail.log
+        name: taisei_macos_fail_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
 
   windows-test-build:
+    name: "Windows CI Test Build"
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-20.04
     container: mstorsjo/llvm-mingw:20210423 # cross-compiler with mingw
@@ -180,6 +189,81 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_windows_fail.log
+        name: taisei_windows_fail_log
+        path: build/meson-logs/meson-log.txt
+        if-no-files-found: warn
+
+  emscripten-test-build:
+    name: "Emscripten CI Test Build"
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: macos-10.15
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Set Up Build Environment
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Build Tools
+      run: |
+        brew install \
+        gcc \
+        pkg-config \
+        docutils \
+        pygments \
+        freetype2 \
+        libzip \
+        opusfile \
+        libvorbis \
+        webp \
+        sdl2 \
+        ninja
+        # pip
+        pip install \
+        meson==0.55.3 \
+        ninja \
+        zstandard
+
+    - name: Setup cache
+      id: cache-system-libraries
+      uses: actions/cache@v2
+      with:
+        path: ${{env.EM_CACHE_FOLDER}}
+        key: ${{env.EM_VERSION}}-${{ runner.os }}
+
+    - uses: mymindstorm/setup-emsdk@v9
+      with:
+        version: ${{env.EM_VERSION}}
+        actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+
+    - name: Setup emsdk
+      uses: mymindstorm/setup-emsdk@v9
+      with:
+        version: 2.0.19
+        actions-cache-folder: 'emsdk-cache'
+
+    - name: Verify emsdk
+      run: emcc -v
+
+    - name: Configure (Meson)
+      run: |
+        meson setup build/ \
+        --native-file ci/emscripten-build-test-ci.ini \
+        -Dbuild.cpp_std=gnu++14 \
+        --prefix=$(pwd)/build-test
+
+    - name: Build & Install
+      run: |
+        meson compile -C build/ --verbose
+        meson install -C build/
+
+    - name: Upload Log
+      uses: actions/upload-artifact@v2
+      with:
+        name: taisei_emscripten_fail_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
