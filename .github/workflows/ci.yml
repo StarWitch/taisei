@@ -249,7 +249,7 @@ jobs:
     - name: Configure (Meson)
       run: >
         meson setup build/
-        --native-file ci/emscripten-build-test-ci.ini
+        --cross-file ci/emscripten-build-test-ci.ini
         --prefix=$(pwd)/build-test
 
         meson configure
