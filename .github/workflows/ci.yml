@@ -1,4 +1,4 @@
-name: taisei-build-tests
+name: 'Taisei CI Build Tests'
 on:
   push:
     branches:
@@ -20,10 +20,9 @@ on:
       - "**.yaml"
       - "**.build"
 
-
-# TODO: upgrade from 2.0.19 when fixes are upstreamed
+# TODO: pin this to a stable version once patches are upstreamed
 env:
-  EM_VERSION: 2.0.19
+  EM_VERSION: 'latest'
   EM_CACHE_FOLDER: 'emsdk-cache'
 
 jobs:
@@ -43,33 +42,33 @@ jobs:
         python-version: '3.x'
 
     - name: Install Build Tools (apt)
-      run: |
+      run: >
         sudo apt update
-        sudo apt install -y -qq \
-        build-essential \
-        libsdl2-dev \
-        libogg-dev \
-        libopusfile-dev \
-        libpng-dev \
-        libzip-dev \
-        libx11-dev \
-        libwayland-dev \
-        python3-docutils \
-        libwebp-dev \
-        libfreetype6-dev \
+
+        sudo apt install -y -qq
+        build-essential
+        libsdl2-dev
+        libogg-dev
+        libopusfile-dev
+        libpng-dev
+        libzip-dev
+        libx11-dev
+        libwayland-dev
+        python3-docutils
+        libwebp-dev
+        libfreetype6-dev
         libzstd-dev
-        # pip
-        pip install \
-        meson==0.55.3 \
-        ninja \
+
+        pip install
+        meson==0.55.3
+        ninja
         zstandard
 
-    # TODO: turn -Dwerror back on when build is fixed
     - name: Configure (Meson)
-      run: |
-        meson setup build/ \
-          --prefix=$(pwd)/build-test \
-          --native-file ci/linux-x86_64-build-test-ci.ini
+      run: >
+        meson setup build/
+        --prefix=$(pwd)/build-test
+        --native-file ci/linux-x86_64-build-test-ci.ini
 
     - name: Build & Install
       run: |
@@ -105,29 +104,29 @@ jobs:
         python-version: '3.x'
 
     - name: Install Build Tools
-      run: |
-        brew install \
-        gcc \
-        pkg-config \
-        docutils \
-        pygments \
-        freetype2 \
-        libzip \
-        opusfile \
-        libvorbis \
-        webp \
-        sdl2 \
+      run: >
+        brew install
+        gcc
+        pkg-config
+        docutils
+        pygments
+        freetype2
+        libzip
+        opusfile
+        libvorbis
+        webp
+        sdl2
         ninja
-        # pip
-        pip install \
-        meson==0.55.3 \
-        ninja \
+
+        pip install
+        meson==0.55.3
+        ninja
         zstandard
 
     - name: Configure (Meson)
-      run: |
-        meson setup build/ \
-        --native-file ci/macos-x86_64-build-test-ci.ini \
+      run: >
+        meson setup build/
+        --native-file ci/macos-x86_64-build-test-ci.ini
         --prefix=$(pwd)/build-test
 
     - name: Build & Install
@@ -155,19 +154,22 @@ jobs:
     container: mstorsjo/llvm-mingw:20210423 # cross-compiler with mingw
     steps:
     - name: Install tools (Apt)
-      run: |
+      run: >
         apt update
+
         apt install -y -qq software-properties-common
+
         add-apt-repository ppa:git-core/ppa -y
-        apt install -y -qq \
-        python3-docutils \
-        python3-pip \
-        git \
+
+        apt install -y -qq
+        python3-docutils
+        python3-pip
+        git
         nsis
-        # pip
-        pip3 install \
-        meson==0.55.3 \
-        ninja \
+
+        pip3 install
+        meson==0.55.3
+        ninja
         zstandard
 
     - name: Checkout Code (Git)
@@ -176,10 +178,10 @@ jobs:
         submodules: 'recursive'
 
     - name: Configure Taisei (Meson)
-      run: |
-        meson setup build/ \
-          --prefix=$(pwd)/build-test \
-          --cross-file ci/windows-llvm_mingw-x86_64-build-test-ci.ini
+      run: >
+        meson setup build/
+        --prefix=$(pwd)/build-test
+        --cross-file ci/windows-llvm_mingw-x86_64-build-test-ci.ini
 
     - name: Build & Install
       run: |
@@ -209,23 +211,23 @@ jobs:
         python-version: '3.x'
 
     - name: Install Build Tools
-      run: |
-        brew install \
-        gcc \
-        pkg-config \
-        docutils \
-        pygments \
-        freetype2 \
-        libzip \
-        opusfile \
-        libvorbis \
-        webp \
-        sdl2 \
+      run: >
+        brew install
+        gcc
+        pkg-config
+        docutils
+        pygments
+        freetype2
+        libzip
+        opusfile
+        libvorbis
+        webp
+        sdl2
         ninja
-        # pip
-        pip install \
-        meson==0.55.3 \
-        ninja \
+
+        pip install
+        meson==0.55.3
+        ninja
         zstandard
 
     - name: Setup cache
@@ -235,25 +237,20 @@ jobs:
         path: ${{env.EM_CACHE_FOLDER}}
         key: ${{env.EM_VERSION}}-${{ runner.os }}
 
-    - uses: mymindstorm/setup-emsdk@v9
-      with:
-        version: ${{env.EM_VERSION}}
-        actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
-
     - name: Setup emsdk
       uses: mymindstorm/setup-emsdk@v9
       with:
-        version: 2.0.19
-        actions-cache-folder: 'emsdk-cache'
+        version: ${{env.EM_VERSION}}
+        actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
 
     - name: Verify emsdk
       run: emcc -v
 
     - name: Configure (Meson)
-      run: |
-        meson setup build/ \
-        --native-file ci/emscripten-build-test-ci.ini \
-        -Dbuild.cpp_std=gnu++14 \
+      run: >
+        meson setup build/
+        --native-file ci/emscripten-build-test-ci.ini
+        -Dbuild.cpp_std=gnu++14
         --prefix=$(pwd)/build-test
 
     - name: Build & Install
