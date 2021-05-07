@@ -1,8 +1,8 @@
 name: Taisei Emscripten Weekly Build
 on:
-  schedule:
-  - cron: 0 13 * * 1
   workflow_dispatch:
+  # schedule:
+  # - cron: 0 13 * * 1
 
 # TODO: use later fixed version of emscripten when it releases
 env:
