@@ -1,4 +1,4 @@
-name: 'Taisei CI Build Tests'
+name: Taisei Build Tests (CI)
 on:
   push:
     branches:
@@ -22,12 +22,13 @@ on:
 
 # TODO: pin this to a stable version once patches are upstreamed
 env:
-  EM_VERSION: 'latest'
-  EM_CACHE_FOLDER: 'emsdk-cache'
+  EM_VERSION: '2.0.19'
+  TAISEI_NOPRELOAD: 0
+  TAISEI_PRELOAD_REQUIRED: 1
 
 jobs:
   linux-test-build:
-    name: "Linux CI Test Build"
+    name: Linux Test Build (x64)
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-20.04
     steps:
@@ -78,18 +79,18 @@ jobs:
     - name: Run Test
       run: $(pwd)/build-test/bin/taisei -R $(pwd)/misc/tests/test-replay.tsr
       env:
-        TAISEI_NOPRELOAD: 0
-        TAISEI_PRELOAD_REQUIRED: 1
+        TAISEI_NOPRELOAD: ${{ env.TAISEI_NOPRELOAD }}
+        TAISEI_PRELOAD_REQUIRED: ${{ env.TAISEI_PRELOAD_REQUIRED }}
 
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_linux_fail_log
+        name: taisei_linux_build_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
 
   macos-test-build:
-    name: "macOS CI Test Build"
+    name: macOS Test Build (x64)
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: macos-10.15
     steps:
@@ -137,18 +138,18 @@ jobs:
     - name: Run Test
       run: $(pwd)/build-test/Taisei.app/Contents/MacOS/Taisei -R $(pwd)/misc/tests/test-replay.tsr
       env:
-        TAISEI_NOPRELOAD: 0
-        TAISEI_PRELOAD_REQUIRED: 1
+        TAISEI_NOPRELOAD: ${{ env.TAISEI_NOPRELOAD }}
+        TAISEI_PRELOAD_REQUIRED: ${{ env.TAISEI_PRELOAD_REQUIRED }}
 
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_macos_fail_log
+        name: taisei_macos_build_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
 
   windows-test-build:
-    name: "Windows CI Test Build"
+    name: Windows Test Build (x64)
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-20.04
     container: mstorsjo/llvm-mingw:20210423 # cross-compiler with mingw
@@ -191,14 +192,14 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_windows_fail_log
+        name: taisei_windows_build_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
 
   emscripten-test-build:
-    name: "Emscripten CI Test Build"
+    name: Emscripten Test Build (WebGL)
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
-    runs-on: macos-10.15
+    runs-on: ubuntu-20.04
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -212,42 +213,43 @@ jobs:
 
     - name: Install Build Tools
       run: >
-        brew install
-        gcc
-        pkg-config
-        docutils
-        pygments
-        freetype2
-        libzip
-        opusfile
-        libvorbis
-        webp
-        sdl2
-        ninja
+        sudo apt update
+
+        sudo apt install -y -qq
+        build-essential
+        libsdl2-dev
+        libogg-dev
+        libopusfile-dev
+        libpng-dev
+        libzip-dev
+        libx11-dev
+        libwayland-dev
+        python3-docutils
+        libwebp-dev
+        libfreetype6-dev
+        libzstd-dev
+        git
 
         pip install
         meson==0.55.3
         ninja
         zstandard
 
-    - name: Setup cache
-      id: cache-system-libraries
-      uses: actions/cache@v2
-      with:
-        path: ${{env.EM_CACHE_FOLDER}}
-        key: ${{env.EM_VERSION}}-${{ runner.os }}
-
-    - name: Setup emsdk
-      uses: mymindstorm/setup-emsdk@v9
-      with:
-        version: ${{env.EM_VERSION}}
-        actions-cache-folder: ${{env.EM_CACHE_FOLDER}}
+    - name: Install emsdk
+      run: |
+        git clone https://github.com/emscripten-core/emsdk.git
+        emsdk/emsdk install ${{ env.EM_VERSION }}
+        emsdk/emsdk activate ${{ env.EM_VERSION }}
 
     - name: Verify emsdk
-      run: emcc -v
+      run: |
+        source emsdk/emsdk_env.sh
+        emcc -v
 
     - name: Configure (Meson)
       run: >
+        source emsdk/emsdk_env.sh
+
         meson setup build/
         --cross-file ci/emscripten-build-test-ci.ini
         --prefix=$(pwd)/build-test
@@ -256,14 +258,16 @@ jobs:
         -Dbuild.cpp_std=gnu++14
         build/
 
-    - name: Build & Install
+    - name: Build
       run: |
-        meson compile -C build/ --verbose
-        meson install -C build/
+        source emsdk/emsdk_env.sh
+        # run twice due to a header race condition with SPIRV-Tools
+        meson compile txz -C build/ --verbose || true
+        meson compile txz -C build/ --verbose
 
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_emscripten_fail_log
+        name: taisei_emscripten_build_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
