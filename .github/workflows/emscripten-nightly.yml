@@ -87,9 +87,11 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@4.1.1
       with:
         branch: main
-        folder: build-weekly
-        repository-name: 'StarWitch/taisei-emscripten-weekly'
-        token: ${{ secrets.EmscriptenWeeklyDeployKey }}
+        target-folder: ./weekly/
+        folder: ./build-weekly/
+        repository-name: StarWitch/taisei-emscripten-weekly
+        commit-message: "${{ github.repository }}@${{ github.sha }}"
+        token: ${{ secrets.DEPLOY_KEY }}
 
     - name: Upload Log
       uses: actions/upload-artifact@v2
