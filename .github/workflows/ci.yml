@@ -1,4 +1,4 @@
-name: Taisei Build Tests (CI)
+name: Taisei Test Builds (CI)
 on:
   push:
     branches:
@@ -45,7 +45,7 @@ jobs:
 
     - name: Install Build Tools (apt)
       run: >
-        sudo apt update
+        sudo apt update || true
 
         sudo apt install -y -qq
         build-essential
@@ -86,7 +86,7 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_linux_build_log
+        name: taisei_linux_fail_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
 
@@ -145,7 +145,7 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_macos_build_log
+        name: taisei_macos_fail_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
 
@@ -157,7 +157,7 @@ jobs:
     steps:
     - name: Install tools (Apt)
       run: >
-        apt update
+        apt update || true
 
         apt install -y -qq software-properties-common
 
@@ -193,7 +193,7 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_windows_build_log
+        name: taisei_windows_fail_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
 
@@ -214,21 +214,11 @@ jobs:
 
     - name: Install Build Tools
       run: >
-        sudo apt update
+        sudo apt update || true
 
         sudo apt install -y -qq
-        build-essential
-        libsdl2-dev
-        libogg-dev
-        libopusfile-dev
-        libpng-dev
-        libzip-dev
-        libx11-dev
-        libwayland-dev
         python3-docutils
-        libwebp-dev
-        libfreetype6-dev
-        libzstd-dev
+        python3-pip
         git
 
         pip install
@@ -240,11 +230,10 @@ jobs:
       id: cache-emsdk
       uses: actions/cache@v2
       with:
-        path: ${{env.EM_CACHE_FOLDER}}
-        key: ${{env.EM_VERSION}}-${{ runner.os }}
+        path: ${{ env.EM_CACHE_FOLDER }}
+        key: ${{ env.EM_VERSION }}-${{ runner.os }}
 
-    # only installs if it doesn't exist in cache
-    - name: Install/Update emsdk
+    - name: Install emsdk
       if: steps.cache-emsdk.outputs.cache-hit != 'true'
       run: |
         rm -rf emsdk/
