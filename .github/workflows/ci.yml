@@ -20,9 +20,10 @@ on:
       - "**.yaml"
       - "**.build"
 
-# TODO: pin this to a stable version once patches are upstreamed
+# TODO: use later version when it releases
 env:
   EM_VERSION: '2.0.19'
+  EM_CACHE_FOLDER: 'emsdk'
   TAISEI_NOPRELOAD: 0
   TAISEI_PRELOAD_REQUIRED: 1
 
@@ -61,7 +62,7 @@ jobs:
         libzstd-dev
 
         pip install
-        meson==0.55.3
+        meson==0.56.2
         ninja
         zstandard
 
@@ -120,7 +121,7 @@ jobs:
         ninja
 
         pip install
-        meson==0.55.3
+        meson==0.56.2
         ninja
         zstandard
 
@@ -169,7 +170,7 @@ jobs:
         nsis
 
         pip3 install
-        meson==0.55.3
+        meson==0.56.2
         ninja
         zstandard
 
@@ -231,12 +232,22 @@ jobs:
         git
 
         pip install
-        meson==0.55.3
+        meson==0.56.2
         ninja
         zstandard
 
-    - name: Install emsdk
+    - name: Pull cached emsdk
+      id: cache-emsdk
+      uses: actions/cache@v2
+      with:
+        path: ${{env.EM_CACHE_FOLDER}}
+        key: ${{env.EM_VERSION}}-${{ runner.os }}
+
+    # only installs if it doesn't exist in cache
+    - name: Install/Update emsdk
+      if: steps.cache-emsdk.outputs.cache-hit != 'true'
       run: |
+        rm -rf emsdk/
         git clone https://github.com/emscripten-core/emsdk.git
         emsdk/emsdk install ${{ env.EM_VERSION }}
         emsdk/emsdk activate ${{ env.EM_VERSION }}
