@@ -52,7 +52,7 @@ jobs:
       run: >
         meson setup build/linux
         --prefix=$(pwd)/build-release
-        --native-file ci/linux-x86_64-build-release.ini
+        --native-file misc/ci/linux-x86_64-build-release.ini
 
     - name: Build & Install
       run: |
@@ -60,7 +60,7 @@ jobs:
         meson install -C build/linux
 
     - name: Run Test (Taisei)
-      run: $(pwd)/build-release/bin/taisei -R $(pwd)/misc/tests/test-replay.tsr
+      run: $(pwd)/build-release/bin/taisei -R $(pwd)/misc/ci/tests/test-replay.tsr
       env:
         TAISEI_NOPRELOAD: 0
         TAISEI_PRELOAD_REQUIRED: 1
@@ -119,7 +119,7 @@ jobs:
       run: >
         meson setup build/macos
         --prefix=$(pwd)/build-release
-        --native-file ci/macos-x86_64-build-release.ini
+        --native-file misc/ci/macos-x86_64-build-release.ini
 
     - name: Build & Install
       run: |
@@ -127,7 +127,7 @@ jobs:
         meson install -C build/macos
 
     - name: Run Test (Taisei)
-      run: $(pwd)/build-release/Taisei.app/Contents/MacOS/Taisei -R $(pwd)/misc/tests/test-replay.tsr
+      run: $(pwd)/build-release/Taisei.app/Contents/MacOS/Taisei -R $(pwd)/misc/ci/tests/test-replay.tsr
       env:
         TAISEI_NOPRELOAD: 0
         TAISEI_PRELOAD_REQUIRED: 1
@@ -190,7 +190,7 @@ jobs:
       run: >
         meson setup build/macos
         --prefix=$(pwd)/build-release
-        --cross-file ci/macos-aarch64-build-release.ini
+        --cross-file misc/ci/macos-aarch64-build-release.ini
 
     - name: Build & Install
       run: |
@@ -268,7 +268,7 @@ jobs:
       run: >
         meson setup build/windows
         --prefix=$(pwd)/build-release
-        --cross-file ci/windows-llvm_mingw-x86_64-build-release.ini
+        --cross-file misc/ci/windows-llvm_mingw-x86_64-build-release.ini
       env:
         LIBEGL: $(pwd)/misc/angle-dll/libEGL.dll
         LIBGLES: $(pwd)/misc/angle-dll/libGLESv2.dll
@@ -364,7 +364,7 @@ jobs:
       run: >
         meson setup build/windows
         --prefix=$(pwd)/build-release
-        --cross-file ci/windows-llvm_mingw-x86-build-release.ini
+        --cross-file misc/ci/windows-llvm_mingw-x86-build-release.ini
       env:
         LIBEGL: $(pwd)/misc/angle-dll/libEGL.dll
         LIBGLES: $(pwd)/misc/angle-dll/libGLESv2.dll
@@ -444,4 +444,4 @@ jobs:
       run: >
         meson setup build/emscripten
         --prefix=$(pwd)/build-release
-        --cross-file ci/emscripten-build-test-ci.ini
+        --cross-file misc/ci/emscripten-build-test-ci.ini
