@@ -240,15 +240,15 @@ jobs:
         git clone https://github.com/emscripten-core/emsdk.git
         emsdk/emsdk install ${{ env.EM_VERSION }}
         emsdk/emsdk activate ${{ env.EM_VERSION }}
-        tee misc/ci/emscripten-ephemeral-ci.ini <<EOF >/dev/null
-        [constants]
-        toolchain = '$(pwd)/emsdk/upstream/emscripten'
-        EOF
 
     - name: Verify emsdk
       run: |
         source emsdk/emsdk_env.sh
         emcc -v
+        tee misc/ci/emscripten-ephemeral-ci.ini <<EOF >/dev/null
+        [constants]
+        toolchain = '$(pwd)/emsdk/upstream/emscripten'
+        EOF
 
     - name: Configure (Meson)
       run: >
