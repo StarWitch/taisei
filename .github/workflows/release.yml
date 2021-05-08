@@ -1,4 +1,4 @@
-name: taisei-build-releases
+name: Taisei Release Build
 on:
   push:
     branches:
@@ -17,7 +17,7 @@ env:
 
 jobs:
   linux-release:
-    name: Linux Release Build (x86_64)
+    name: Linux Release Build (x64)
     runs-on: ubuntu-18.04
     steps:
     - name: Install Python
