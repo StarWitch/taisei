@@ -89,8 +89,8 @@ jobs:
         path: build/linux/meson-logs/meson-log.txt
         if-no-files-found: warn
 
-  macos-release-intel:
-    name: macOS Release (Intel)
+  macos-release-x64:
+    name: macOS Release (x64)
     runs-on: macos-10.15
     steps:
     - name: Checkout Code
@@ -156,8 +156,8 @@ jobs:
         path: build/macos/meson-logs/meson-log.txt
         if-no-files-found: warn
 
-  macos-release-arm64:
-    name: macOS Release (Apple Silicon)
+  macos-release-aarch64:
+    name: macOS Release (ARM)
     runs-on: macos-11.0
     # making this message-dependent until GitHub actually releases macOS 11.0 runners
     # mandatory for aarch64 builds, unfortunately
