@@ -1,8 +1,9 @@
 name: Taisei Emscripten Weekly Build
+# trigger manually, or once a week on Monday
 on:
   workflow_dispatch:
-  # schedule:
-  # - cron: 0 13 * * 1
+  schedule:
+  - cron: 0 13 * * 1
 
 # TODO: use later fixed version of emscripten when it releases
 env:
