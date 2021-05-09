@@ -286,9 +286,9 @@ jobs:
     steps:
     - name: Install Build Tools
       run: >
-        sudo apt update || true
+        apt update || true
 
-        sudo apt install -y -qq
+        apt install -y -qq
         build-essential
         libsdl2-dev
         libogg-dev
