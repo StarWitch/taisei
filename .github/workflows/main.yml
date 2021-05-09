@@ -284,11 +284,6 @@ jobs:
     runs-on: ubuntu-20.04
     container: devkitpro/devkita64:20210306
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-
     - name: Install Python
       uses: actions/setup-python@v2
       with:
@@ -297,6 +292,10 @@ jobs:
     - name: Install Build Tools
       run: >
         sudo apt update || true
+
+        apt install -y -qq software-properties-common
+
+        add-apt-repository ppa:git-core/ppa -y
 
         sudo apt install -y -qq
         build-essential
@@ -311,12 +310,17 @@ jobs:
         libwebp-dev
         libfreetype6-dev
         libzstd-dev
-        gdebi-core
+        git
 
         pip install
         meson==0.56.2
         ninja
         zstandard
+
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
 
     - name: Configure (Meson)
       run: >
