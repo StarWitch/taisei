@@ -33,11 +33,15 @@ pkgconfig = '$(bin_path pkg-config)'
 elf2nro = '$(which elf2nro)'
 nacptool = '$(which nacptool)'
 
-[properties]
+[project options]
+deprecations_warnings = 'no-error'
+
+[built-in options]
 c_args = [$(meson_arg_list $CPPFLAGS $CFLAGS)]
 c_link_args = [$(meson_arg_list $LDFLAGS $LIBS $ADDITIONAL_LINK_FLAGS)]
 cpp_args = [$(meson_arg_list $CPPFLAGS $CXXFLAGS)]
 cpp_link_args = [$(meson_arg_list $LDFLAGS $LIBS $ADDITIONAL_LINK_FLAGS)]
+werror = false
 
 [host_machine]
 system = 'nx'
