@@ -282,7 +282,7 @@ jobs:
     name: Switch (ARM64)
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
     runs-on: ubuntu-20.04
-    container: starwitch/taisei-switch-tools:20210509
+    container: starwitch/taisei-switch-toolkit:20210509
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
