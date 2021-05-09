@@ -286,16 +286,13 @@ jobs:
     steps:
     - name: Install Build Tools
       run: >
-        sudo apt update || true
-
-        apt install -y -qq software-properties-common
-
-        add-apt-repository ppa:git-core/ppa -y
+        echo "deb http://deb.debian.org/debian stretch-backports main"
+        >> /etc/apt/sources.list.d/backports.list
 
         sudo apt update || true
 
         sudo apt install -y -qq
-        git
+        git/stretch-backports
         build-essential
         libsdl2-dev
         libogg-dev
