@@ -286,13 +286,9 @@ jobs:
     steps:
     - name: Install Build Tools
       run: >
-        echo "deb http://deb.debian.org/debian stretch-backports main"
-        >> /etc/apt/sources.list.d/backports.list
-
         sudo apt update || true
 
         sudo apt install -y -qq
-        git/stretch-backports
         build-essential
         libsdl2-dev
         libogg-dev
@@ -314,11 +310,13 @@ jobs:
 
     - name: Checkout Code
       uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
 
     - name: Configure (Meson)
       run: >
+        git submodules init
+
+        git submodules update
+
         switch/crossfile.sh > misc/ci/switch-crossfile-ci.ini
 
         meson setup build/
