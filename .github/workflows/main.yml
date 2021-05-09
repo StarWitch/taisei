@@ -284,11 +284,6 @@ jobs:
     runs-on: ubuntu-20.04
     container: devkitpro/devkita64:20210306
     steps:
-    - name: Install Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-
     - name: Install Build Tools
       run: >
         sudo apt update || true
@@ -313,7 +308,7 @@ jobs:
         libzstd-dev
         git
 
-        pip install
+        pip3 install
         meson==0.56.2
         ninja
         zstandard
