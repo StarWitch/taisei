@@ -313,9 +313,9 @@ jobs:
 
     - name: Configure (Meson)
       run: >
-        git submodules init
+        git submodule init
 
-        git submodules update
+        git submodule update
 
         switch/crossfile.sh > misc/ci/switch-crossfile-ci.ini
 
