@@ -22,6 +22,7 @@ on:
 
 # TODO: use later fixed version of emscripten when it releases
 env:
+  SWITCH_DEVKIT_VERSION: '1.0.2'
   EM_VERSION: '2.0.19'
   EM_CACHE_FOLDER: 'emsdk'
   TAISEI_NOPRELOAD: 0
@@ -86,7 +87,7 @@ jobs:
     - name: Upload Log
       uses: actions/upload-artifact@v2
       with:
-        name: taisei_linux_fail_log
+        name: taisei_linux_build_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
 
@@ -274,5 +275,65 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: taisei_emscripten_build_log
+        path: build/meson-logs/meson-log.txt
+        if-no-files-found: warn
+
+  switch-test-build:
+    name: Switch (ARM64)
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-20.04
+    container: devkitpro/devkita64:20210306
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install Build Tools
+      run: >
+        sudo apt update || true
+
+        sudo apt install -y -qq
+        build-essential
+        libsdl2-dev
+        libogg-dev
+        libopusfile-dev
+        libpng-dev
+        libzip-dev
+        libx11-dev
+        libwayland-dev
+        python3-docutils
+        libwebp-dev
+        libfreetype6-dev
+        libzstd-dev
+        gdebi-core
+
+        pip install
+        meson==0.56.2
+        ninja
+        zstandard
+
+    - name: Configure (Meson)
+      run: >
+        switch/crossfile.sh > misc/ci/switch-crossfile-ci.ini
+
+        meson setup build/
+        --prefix=$(pwd)/build-test
+        --cross-file=misc/ci/switch-crossfile-ci.ini
+
+    - name: Build & Install
+      run: |
+        meson compile -C build/ --verbose
+        meson install -C build/
+
+    - name: Upload Log
+      uses: actions/upload-artifact@v2
+      with:
+        name: taisei_switch_build_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
