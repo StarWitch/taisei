@@ -307,6 +307,7 @@ jobs:
         libx11-dev
         libwayland-dev
         python3-docutils
+        python3-pip
         libwebp-dev
         libfreetype6-dev
         libzstd-dev
