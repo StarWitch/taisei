@@ -52,6 +52,7 @@ jobs:
           sha256sum /opt/windows-x86-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86.zip > /opt/windows-x86-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86.zip.sha256
           sha256sum /opt/windows-x86-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86.exe > /opt/windows-x86-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86.exe.sha256
           sha256sum /opt/emscripten-wasm32-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-emscripten-wasm32.tar.xz > /opt/emscripten-wasm32-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-emscripten-wasm32.tar.xz.sha256
+          sha256sum /opt/switch-aarch64-${{ env.taisei_version }}-zip/Taisei-${{ env.taisei_version }}-switch-aarch64.zip > /opt/switch-aarch64-${{ env.taisei_version }}-zip/Taisei-${{ env.taisei_version }}-switch-aarch64.zip.sha256sum
 
       - name: Release Taisei Packages
         uses: softprops/action-gh-release@v1
@@ -80,6 +81,8 @@ jobs:
             /opt/windows-x86-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86.zip.sha256
             /opt/emscripten-wasm32-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-emscripten-wasm32.tar.xz
             /opt/emscripten-wasm32-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-emscripten-wasm32.tar.xz.sha256
+            /opt/switch-aarch64-${{ env.taisei_version }}-zip/Taisei-${{ env.taisei_version }}-switch-aarch64.zip
+            /opt/switch-aarch64-${{ env.taisei_version }}-zip/Taisei-${{ env.taisei_version }}-switch-aarch64.zip.sha256sum
 
       # TODO: needs DEPLOY_KEY
       # - name: Deploy to GitHub Pages (Stable)

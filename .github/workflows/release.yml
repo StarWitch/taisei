@@ -421,7 +421,7 @@ jobs:
         path: build/windows/meson-logs/meson-log.txt
         if-no-files-found: warn
 
-  emscripten-test-build:
+  emscripten-release-build:
     name: Emscripten Release (WebGL)
     runs-on: ubuntu-20.04
     steps:
@@ -509,5 +509,42 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: taisei_emscripten_build_log
+        path: build/meson-logs/meson-log.txt
+        if-no-files-found: warn
+
+  switch-release-build:
+    name: Switch (ARM64)
+    runs-on: ubuntu-20.04
+    container: starwitch/taisei-switch-toolkit:20210509
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Configure (Meson)
+      run: >
+        switch/crossfile.sh > misc/ci/switch-crossfile-ci.ini
+
+        meson setup build/nx
+        --prefix=$(pwd)/build-test
+        --cross-file=misc/ci/switch-crossfile-ci.ini
+
+    - name: Build
+      run: |
+        meson compile zip -C build/nx --verbose
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      if: success()
+      with:
+        name: switch-aarch64-${{ steps.vars.outputs.tag }}-zip
+        path: build/nx/Taisei-${{ steps.vars.outputs.tag }}-switch-aarch64.zip
+        if-no-files-found: error
+
+    - name: Upload Log
+      uses: actions/upload-artifact@v2
+      with:
+        name: taisei_switch_release_log
         path: build/meson-logs/meson-log.txt
         if-no-files-found: warn
