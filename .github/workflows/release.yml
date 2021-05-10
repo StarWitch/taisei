@@ -532,7 +532,7 @@ jobs:
 
     - name: Build
       run: |
-        meson compile zip -C build/nx --verbose
+        ninja zip -C build/nx --verbose
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
