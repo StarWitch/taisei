@@ -2,12 +2,12 @@ name: Taisei Release Builds
 on:
   push:
     branches:
-      - rc/v*.*.*
-      - testing/v*.*.*
+      - v*.*.*-rc
+      - v*.*.*-beta
     tags:
       - v*.*.*
-      - testing/v*.*.*
-      - rc/v*.*.*
+      - v*.*.*-rc
+      - v*.*.*-beta
 
 env:
   EM_VERSION: '2.0.19'
