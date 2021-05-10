@@ -275,7 +275,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: taisei_emscripten_build_log
-        path: build/meson-logs/meson-log.txt
+        path: build/emscripten/meson-logs/meson-log.txt
         if-no-files-found: warn
 
   switch-test-build:
@@ -306,5 +306,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: taisei_switch_build_log
-        path: build/meson-logs/meson-log.txt
+        path: build/nx/meson-logs/meson-log.txt
         if-no-files-found: warn
