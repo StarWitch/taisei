@@ -72,7 +72,7 @@ jobs:
         TAISEI_PRELOAD_REQUIRED: ${{ env.TAISEI_PRELOAD_REQUIRED }}
 
     - name: Package
-      run: meson compile txz -C build/linux --verbose
+      run: ninja txz -C build/linux --verbose
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -139,7 +139,7 @@ jobs:
         TAISEI_PRELOAD_REQUIRED: ${{ env.TAISEI_PRELOAD_REQUIRED }}
 
     - name: Package
-      run: meson compile dmg -C build/macos --verbose
+      run: ninja dmg -C build/macos --verbose
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -157,7 +157,7 @@ jobs:
         if-no-files-found: warn
 
   macos-release-aarch64:
-    name: macOS (ARM)
+    name: macOS (ARM64)
     runs-on: macos-11.0
     # making this message-dependent until GitHub actually releases macOS 11.0 runners
     # mandatory for aarch64 builds, unfortunately
@@ -211,7 +211,7 @@ jobs:
     #     TAISEI_PRELOAD_REQUIRED: ${{ env.TAISEI_PRELOAD_REQUIRED }}
 
     - name: Package
-      run: meson compile dmg -C build/macos --verbose
+      run: ninja dmg -C build/macos --verbose
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -295,10 +295,13 @@ jobs:
         --cross-file misc/ci/windows-x64-ephemeral-release-ci.ini
         --prefix=$(pwd)/build-release
 
-    - name: Build & Package (EXE)
-      run: meson compile nsis -C build/windows --verbose
+    - name: Build
+      run: meson compile -C build/windows
 
-    - name: Upload Artifacts (EXE)
+    - name: Package (EXE)
+      run: ninja nsis -C build/windows --verbose
+
+    - name: Upload Artifact (EXE)
       uses: actions/upload-artifact@v2
       if: success()
       with:
@@ -306,7 +309,7 @@ jobs:
         path: build/windows/Taisei-${{ steps.vars.outputs.tag }}-setup-x86_64.exe
         if-no-files-found: error
 
-    - name: Build/Package (ZIP)
+    - name: Package (ZIP)
       run: ninja zip -C build/windows --verbose
 
     - name: Upload Artifact (ZIP)
@@ -395,10 +398,13 @@ jobs:
         --cross-file misc/ci/windows-x86-ephemeral-release-ci.ini
         --prefix=$(pwd)/build-release
 
-    - name: Build/Package (EXE)
-      run: meson compile nsis -C build/windows --verbose
+    - name: Build
+      run: meson compile -C build/windows
 
-    - name: Upload Artifacts (EXE)
+    - name: Package (EXE)
+      run: ninja nsis -C build/windows --verbose
+
+    - name: Upload Artifact (EXE)
       uses: actions/upload-artifact@v2
       if: success()
       with:
@@ -406,7 +412,7 @@ jobs:
         path: build/windows/Taisei-${{ steps.vars.outputs.tag }}-setup-x86.exe
         if-no-files-found: error
 
-    - name: Build/Package (ZIP)
+    - name: Package (ZIP)
       run: ninja zip -C build/windows --verbose
 
     - name: Upload Artifact (ZIP)
@@ -497,8 +503,13 @@ jobs:
       run: |
         source emsdk/emsdk_env.sh
         # TODO: fix race condition in SPIRV-Tools headers
-        meson compile txz -C build/emscripten --verbose || true
-        meson compile txz -C build/emscripten --verbose
+        meson compile -C build/emscripten --verbose || true
+        meson compile -C build/emscripten --verbose
+
+    - name: Package
+      run: |
+        source emsdk/emsdk_env.sh
+        ninja txz -C build/emscripten --verbose
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -538,8 +549,10 @@ jobs:
         --prefix=$(pwd)/build-release
 
     - name: Build
-      run: |
-        ninja zip -C build/nx --verbose
+      run: meson compile -C build/nx --verbose
+
+    - name: Package
+      run: ninja zip -C build/nx --verbose
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2

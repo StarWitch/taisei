@@ -51,7 +51,7 @@ jobs:
           workflow_conclusion: success
           path: /opt
 
-      - name: Create SHA256Sums
+      - name: Create sha256sums
         run: |
           sha256sum /opt/linux-x86_64-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz > /opt/linux-x86_64-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz.sha256
           sha256sum /opt/macos-x86_64-${{ env.taisei_version }}-dmg/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg > /opt/macos-x86_64-${{ env.taisei_version }}-dmg/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg.sha256
@@ -65,15 +65,15 @@ jobs:
           # sha256sum /opt/windows-x86-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86.exe > /opt/windows-x86-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86.exe.sha256
           # sha256sum /opt/macos-aarch64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-macOS-aarch64.dmg > /opt/macos-aarch64-${{ env.taisei_version }}/Taisei-${{ env.taisei_version }}-macOS-aarch64.dmg.sha256
 
-      - name: GPG Sign Packages
+      - name: Create GPG Signatures
         run: |
           gpg /opt/linux-x86_64-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz.sig --detach-sig /opt/linux-x86_64-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-linux-x86_64.tar.xz
           gpg --output /opt/macos-x86_64-${{ env.taisei_version }}-dmg/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg.sig --detach-sig /opt/macos-x86_64-${{ env.taisei_version }}-dmg/Taisei-${{ env.taisei_version }}-macOS-x86_64.dmg
           gpg --output /opt/windows-x86_64-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86_64.zip.sig --detach-sig /opt/windows-x86_64-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86_64.zip
           gpg --output /opt/windows-x86_64-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86_64.exe.sig --detach-sig /opt/windows-x86_64-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86_64.exe
           gpg --output /opt/emscripten-wasm32-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-emscripten-wasm32.tar.xz.sig --detach-sig /opt/emscripten-wasm32-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-emscripten-wasm32.tar.xz
-          gpg --output /opt/switch-aarch64-${{ env.taisei_version }}-zip/Taisei-${{ env.taisei_version }}-switch-aarch64.zip.sig --detach-sig /opt/switch-aarch64-${{ env.taisei_version }}-zip/Taisei-${{ env.taisei_version }}-switch-aarch64.zip.gpg
-          gpg --output /opt/source-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-source.tar.xz.sig --detach-sig /opt/source-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-source.tar.xz.gpg
+          gpg --output /opt/switch-aarch64-${{ env.taisei_version }}-zip/Taisei-${{ env.taisei_version }}-switch-aarch64.zip.sig --detach-sig /opt/switch-aarch64-${{ env.taisei_version }}-zip/Taisei-${{ env.taisei_version }}-switch-aarch64.zip
+          gpg --output /opt/source-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-source.tar.xz.sig --detach-sig /opt/source-${{ env.taisei_version }}-txz/Taisei-${{ env.taisei_version }}-source.tar.xz
           # TODO: re-enable these when build issues are fixed
           # gpg --output /opt/windows-x86-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86.zip.sig --detach-sig /opt/windows-x86-${{ env.taisei_version }}-setup-zip/Taisei-${{ env.taisei_version }}-setup-x86.zip
           # gpg --output /opt/windows-x86-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86.exe.sig --detach-sig /opt/windows-x86-${{ env.taisei_version }}-setup-exe/Taisei-${{ env.taisei_version }}-setup-x86.exe
