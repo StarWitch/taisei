@@ -555,3 +555,30 @@ jobs:
         name: taisei_switch_release_log
         path: build/nx/meson-logs/meson-log.txt
         if-no-files-found: warn
+
+  source-release:
+    name: Source (Archive)
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Set Build Env
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/tags/v}
+
+    - name: Compress Source
+      run: >
+        tar --exclude-vcs -cf - ./ |
+        xz -9e --threads=8 -c - >
+        ../Taisei-${{ steps.vars.outputs.tag }}-source.tar.xz
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      if: success()
+      with:
+        name: source-${{ steps.vars.outputs.tag }}-txz
+        path: ../Taisei-${{ steps.vars.outputs.tag }}-source.tar.xz
+        if-no-files-found: error
