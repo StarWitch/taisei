@@ -573,12 +573,12 @@ jobs:
       run: >
         tar --exclude-vcs -cf - ./ |
         xz -9e --threads=8 -c - >
-        ../Taisei-${{ steps.vars.outputs.tag }}-source.tar.xz
+        Taisei-${{ steps.vars.outputs.tag }}-source.tar.xz
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       if: success()
       with:
         name: source-${{ steps.vars.outputs.tag }}-txz
-        path: ../Taisei-${{ steps.vars.outputs.tag }}-source.tar.xz
+        path: Taisei-${{ steps.vars.outputs.tag }}-source.tar.xz
         if-no-files-found: error
