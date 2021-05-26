@@ -6,7 +6,6 @@ on:
       - angle-or-devil
 
 env:
-  DEPOT_TOOLS_WIN_TOOLCHAIN: 0
   ANGLE_VERSION: 4484
 
 jobs:
@@ -24,11 +23,24 @@ jobs:
     - name: Clone ANGLE
       run: |
         git clone https://github.com/google/angle.git
+        cd angle
+        python .\scripts\bootstrap.py
+      env:
+        DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+
+    - name: Fetch Cached third_party
+      id: 3rdparty-cache
+      uses: actions/cache@v2
+      with:
+        path: angle/third_party/
+        key: thirdparty-${{ env.ANGLE_VERSION }}
 
     - name: Build ANGLE
       run: |
         cd angle
-        python .\scripts\bootstrap.py
         gclient sync
+        git checkout chromium/${{ env.ANGLE_VERSION }}
         gn gen out/x64 --args="is_debug=false dcheck_always_on=false target_cpu=x64"
         autoninja -C out/x64 libGLESv2 libEGL
+      env:
+        DEPOT_TOOLS_WIN_TOOLCHAIN: 0
