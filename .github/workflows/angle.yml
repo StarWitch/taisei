@@ -1,0 +1,32 @@
+name: ANGLE DLLs
+on:
+  push:
+    branches:
+      - master
+      - angle-or-devil
+
+env:
+  DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+  ANGLE_VERSION: 4484
+
+jobs:
+  linux-test-build:
+    name: "x86/x64"
+    runs-on: windows-2019
+    steps:
+    - name: Install Depot Tools
+      run: |
+        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+        echo "$PWD/depot_tools" >> $GITHUB_PATH
+
+    - name: Clone ANGLE
+      run: |
+        git clone https://github.com/google/angle.git
+
+    - name: Build ANGLE
+      run: |
+        cd angle
+        python .\scripts\bootstrap.py
+        gclient sync
+        gn gen out/x64 --args="is_debug=false dcheck_always_on=false target_cpu=x64"
+        autoninja -C out/x64 libGLESv2 libEGL
