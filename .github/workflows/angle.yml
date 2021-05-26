@@ -40,6 +40,6 @@ jobs:
         gclient sync
         git checkout chromium/${{ env.ANGLE_VERSION }}
         gn gen out/x64 --args='is_debug=false dcheck_always_on=false target_cpu=\"x64\"'
-        ninja -C out/x64 libEGL libGLESv2
+        #ninja -C out/x64 libEGL libGLESv2
       env:
         DEPOT_TOOLS_WIN_TOOLCHAIN: 0
