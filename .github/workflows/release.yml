@@ -51,9 +51,9 @@ jobs:
 
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
-      env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      with:
+        gpg-private-key: ${{ secrets.gpg_private_key }}
+        passphrase: ${{ secrets.gpg_passphrase }}
 
     - name: Set Build Env
       id: vars
@@ -141,9 +141,9 @@ jobs:
 
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
-      env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      with:
+        gpg-private-key: ${{ secrets.gpg_private_key }}
+        passphrase: ${{ secrets.gpg_passphrase }}
 
     - name: Set Build Env
       id: vars
@@ -219,9 +219,9 @@ jobs:
 
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
-      env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      with:
+        gpg-private-key: ${{ secrets.gpg_private_key }}
+        passphrase: ${{ secrets.gpg_passphrase }}
 
     - name: Set Build Env
       id: vars
@@ -321,9 +321,9 @@ jobs:
 
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
-      env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      with:
+        gpg-private-key: ${{ secrets.gpg_private_key }}
+        passphrase: ${{ secrets.gpg_passphrase }}
 
     - name: Set Build Env
       id: vars
@@ -428,9 +428,9 @@ jobs:
 
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
-      env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      with:
+        gpg-private-key: ${{ secrets.gpg_private_key }}
+        passphrase: ${{ secrets.gpg_passphrase }}
 
     - name: Set Build Env
       id: vars
@@ -515,9 +515,9 @@ jobs:
 
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
-      env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      with:
+        gpg-private-key: ${{ secrets.gpg_private_key }}
+        passphrase: ${{ secrets.gpg_passphrase }}
 
     - name: Set Build Env
       id: vars
@@ -602,9 +602,9 @@ jobs:
 
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
-      env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      with:
+        gpg-private-key: ${{ secrets.gpg_private_key }}
+        passphrase: ${{ secrets.gpg_passphrase }}
 
     - name: Set Build Env
       id: vars
