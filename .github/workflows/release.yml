@@ -49,9 +49,6 @@ jobs:
         submodules: 'recursive'
         fetch-depth: 1
 
-    - name: Fetch Tags
-      run: git fetch --prune --unshallow --tags
-
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
       env:
@@ -142,9 +139,6 @@ jobs:
         submodules: "recursive"
         fetch-depth: 1
 
-    - name: Fetch Tags
-      run: git fetch --prune --unshallow --tags
-
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
       env:
@@ -222,9 +216,6 @@ jobs:
       with:
         submodules: "recursive"
         fetch-depth: 1
-
-    - name: Fetch Tags
-      run: git fetch --prune --unshallow --tags
 
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
@@ -321,9 +312,6 @@ jobs:
       with:
         submodules: "recursive"
         fetch-depth: 1
-
-    - name: Fetch Tags
-      run: git fetch --prune --unshallow --tags
 
     - name: Checkout ANGLE DLLs
       uses: actions/checkout@v2
@@ -432,9 +420,6 @@ jobs:
         submodules: "recursive"
         fetch-depth: 1
 
-    - name: Fetch Tags
-      run: git fetch --prune --unshallow --tags
-
     - name: Checkout ANGLE DLLs
       uses: actions/checkout@v2
       with:
@@ -528,9 +513,6 @@ jobs:
         submodules: 'recursive'
         fetch-depth: 1
 
-    - name: Fetch Tags
-      run: git fetch --prune --unshallow --tags
-
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
       env:
@@ -617,9 +599,6 @@ jobs:
       with:
         submodules: 'recursive'
         fetch-depth: 1
-
-    - name: Fetch Tags
-      run: git fetch --prune --unshallow --tags
 
     - name: Import GPG Key
       uses: taisei-project/ghaction-import-gpg@v3
