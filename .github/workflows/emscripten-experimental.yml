@@ -6,10 +6,9 @@ on:
     branches: [master]
     types:
       - completed
-      - requested
   schedule:
-    # run every friday at 20:00
-    - cron: '0 20 * * 5'
+    # run every friday at 11:00
+    - cron: '0 11 * * 5'
 
 env:
   MESON_VERSION: '0.56.2'
