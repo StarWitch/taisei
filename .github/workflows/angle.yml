@@ -16,10 +16,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { name: "Windows", os: "windows-2019", arch: "x86" }
-          - { name: "Windows", os: "windows-2019", arch: "x64" }
-          - { name: "macOS", os: "macos-10.15", arch: "x64" }
-          - { name: "macOS", os: "macos-10.15", arch: "arm64" }
+          - { name: "Windows", os: "windows-2019", arch: "x86", extension: "dll" }
+          - { name: "Windows", os: "windows-2019", arch: "x64", extension: "dll" }
+          - { name: "macOS", os: "macos-10.15", arch: "x64", extension: "dylib" }
+          - { name: "macOS", os: "macos-10.15", arch: "arm64", extension: "dylib" }
     steps:
     - name: Clone ANGLE
       run: |
@@ -48,28 +48,44 @@ jobs:
         path: angle/tools/
         key: tools-${{ env.ANGLE_VERSION }}-${{ matrix.os }}
 
-    - name: Install Depot Tools (Windows)
-      if: steps.depot-tools-cache.outputs.cache-hit != true
-      run: >
-        Invoke-WebRequest -Uri "https://storage.googleapis.com/chrome-infra/depot_tools.zip" -OutFile depot_tools.zip
-        Expand-Archive -Path depot_tools.zip -DestinationPath depot_tools
-        Remove-Item depot_tools.zip
+    # - name: Install Depot Tools (Windows)
+    #   if: steps.depot-tools-cache.outputs.cache-hit != true && startsWith(matrix.os, "Windows")
+    #   run: |
+    #     Invoke-WebRequest -Uri "https://storage.googleapis.com/chrome-infra/depot_tools.zip" -OutFile depot_tools.zip
+    #     Expand-Archive -Path depot_tools.zip -DestinationPath depot_tools
+    #     Remove-Item depot_tools.zip
 
-    - name: Install Depot Tools (Mac)
+    - name: Install Depot Tools
       if: steps.depot-tools-cache.outputs.cache-hit != true
-      run: >
-        Invoke-WebRequest -Uri "https://storage.googleapis.com/chrome-infra/depot_tools.zip" -OutFile depot_tools.zip
-        Expand-Archive -Path depot_tools.zip -DestinationPath depot_tools
-        Remove-Item depot_tools.zip
+      run: |
+        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+      shell: bash
 
     - name: Build ANGLE
       run: |
-        echo "$pwd\depot_tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        export PATH=$PWD/depot_tools:$PATH
         cd angle
         python ./scripts/bootstrap.py
         gclient sync
         git checkout chromium/${{ env.ANGLE_VERSION }}
         gn gen out/${{ matrix.arch }} --args='is_debug=false dcheck_always_on=false target_cpu=\"${{ matrix.arch }}\"'
-        ninja -C out/x64 libEGL libGLESv2
+        ninja -C out/${{ matrix.arch }} libEGL libGLESv2
       env:
         DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+      shell: bash
+
+    - name: Upload Artifact (libGLESv2)
+      uses: actions/upload-artifact@v2
+      if: success()
+      with:
+        name: ${{ matrix.os }}-${{ matrix.arch }}-libGLESv2
+        path: out/${{ matrix.arch }}/libGLESv2.${{ matrix.extension }}
+        if-no-files-found: error
+
+    - name: Upload Artifact (libEGL)
+      uses: actions/upload-artifact@v2
+      if: success()
+      with:
+        name: ${{ matrix.os }}-${{ matrix.arch }}-libEGL
+        path: out/${{ matrix.arch }}/libEGL.${{ matrix.extension }}
+        if-no-files-found: error
