@@ -546,6 +546,7 @@ Summary:
     Executables:            @12@
     Data:                   @13@
     Documentation:          @14@
+    Release Files:          @17@
 '''.format(
         taisei_version_string,
         systype,
@@ -566,7 +567,8 @@ Summary:
         join_paths('$prefix', data_path),
         join_paths('$prefix', doc_path),
         is_developer_build,
-        stages_live_reload
+        stages_live_reload,
+        get_option('release_files')
     )
 
 message(summary)
