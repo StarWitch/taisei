@@ -19,7 +19,7 @@ jobs:
           - { name: "Windows", os: "windows-2019", arch: "x86", extension: "dll" }
           - { name: "Windows", os: "windows-2019", arch: "x64", extension: "dll" }
           - { name: "macOS", os: "macos-10.15", arch: "x64", extension: "dylib" }
-          - { name: "macOS", os: "macos-10.15", arch: "arm64", extension: "dylib" }
+          - { name: "macOS", os: "macos-11.0", arch: "arm64", extension: "dylib" }
           - { name: "Linux", os: "ubuntu-latest", arch: "x64", extension: "so" }
 
     steps:
@@ -32,6 +32,12 @@ jobs:
       run: |
         git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
       shell: bash
+
+    # - name: Install Dependencies (Linux)
+    #   if: contains(matrix.name, 'Linux')
+    #   run: |
+    #     cd angle/ && ./build/install-build-deps.sh --no-chromeos-fonts --no-prompt
+    #   shell: bash
 
     - name: Fetch Cached third_party
       id: third-party-cache
@@ -47,13 +53,28 @@ jobs:
         path: angle/tools/
         key: angletools-${{ env.ANGLE_VERSION }}-${{ matrix.os }}
 
-    - name: Build ANGLE
-      run: |
+    - name: Compile
+      run: >
         export PATH=$PWD/depot_tools:$PATH
+
         cd angle
+
         python ./scripts/bootstrap.py
+
         gclient sync
-        gn gen out/${{ matrix.arch }} --args='is_debug=false dcheck_always_on=false target_cpu="${{ matrix.arch }}"'
+
+        gn gen out/${{ matrix.arch }} --args='
+        angle_enable_d3d11=${{ contains(runner.os, 'Windows') }}
+        angle_enable_d3d9=${{ contains(runner.os, 'Windows') }}
+        angle_enable_metal=${{ contains(runner.os, 'macOS') }}
+        angle_enable_vulkan=${{ contains(runner.os, 'Linux') }}
+        angle_enable_glsl=true
+        angle_enable_gl=true
+        angle_enable_essl=false
+        is_debug=false
+        dcheck_always_on=false
+        target_cpu="${{ matrix.arch }}"'
+
         ninja -C out/${{ matrix.arch }} libEGL libGLESv2
       env:
         DEPOT_TOOLS_WIN_TOOLCHAIN: 0
@@ -74,22 +95,14 @@ jobs:
     needs: [angle-build]
     runs-on: ubuntu-latest
     steps:
-      - name: Wait For Build
-        uses: fountainhead/action-wait-for-check@v1.0.0
-        id: wait-for-build
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: angle-build
-
       - name: Checkout Repo
         uses: actions/checkout@v2
         with:
           ref: angle-or-devil
 
       - name: Download Artifacts From Build
-        uses: dawidd6/action-download-artifact@v2
+        uses: actions/download-artifact@v2
         with:
-          workflow: angle.yml
           path: angle/
 
       - name: Commit & Push ANGLE Libraries
