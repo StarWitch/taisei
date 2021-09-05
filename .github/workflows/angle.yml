@@ -58,9 +58,9 @@ jobs:
       run: |
         export PATH=$PWD/depot_tools:$PATH
         cd angle
+        git checkout chromium/${{ env.ANGLE_VERSION }}
         python ./scripts/bootstrap.py
         gclient sync
-        git checkout chromium/${{ env.ANGLE_VERSION }}
         gn gen out/${{ matrix.arch }} --args='is_debug=false dcheck_always_on=false target_cpu="${{ matrix.arch }}"'
         ninja -C out/${{ matrix.arch }} libEGL libGLESv2
       env:
