@@ -21,12 +21,17 @@ jobs:
           - { name: "macOS", os: "macos-10.15", arch: "x64", extension: "dylib" }
           - { name: "macOS", os: "macos-10.15", arch: "arm64", extension: "dylib" }
           - { name: "Linux", os: "ubuntu-latest", arch: "x64", extension: "so" }
+
     steps:
     - name: Clone ANGLE
       run: |
-        git clone https://github.com/google/angle.git
-      env:
-        DEPOT_TOOLS_WIN_TOOLCHAIN: 0
+        git clone --branch chromium/${{ env.ANGLE_VERSION }} https://github.com/google/angle.git
+      shell: bash
+
+    - name: Install Depot Tools
+      run: |
+        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
+      shell: bash
 
     - name: Fetch Cached third_party
       id: third-party-cache
@@ -42,24 +47,10 @@ jobs:
         path: angle/tools/
         key: angletools-${{ env.ANGLE_VERSION }}-${{ matrix.os }}
 
-    - name: Fetch Cached depot_tools
-      id: depot-tools-cache
-      uses: actions/cache@v2
-      with:
-        path: depot_tools/
-        key: depot-tools-${{ env.ANGLE_VERSION }}-${{ matrix.os }}
-
-    - name: Install Depot Tools
-      if: steps.depot-tools-cache.outputs.cache-hit != true
-      run: |
-        git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-      shell: bash
-
     - name: Build ANGLE
       run: |
         export PATH=$PWD/depot_tools:$PATH
         cd angle
-        git checkout chromium/${{ env.ANGLE_VERSION }}
         python ./scripts/bootstrap.py
         gclient sync
         gn gen out/${{ matrix.arch }} --args='is_debug=false dcheck_always_on=false target_cpu="${{ matrix.arch }}"'
@@ -68,20 +59,14 @@ jobs:
         DEPOT_TOOLS_WIN_TOOLCHAIN: 0
       shell: bash
 
-    - name: Upload Artifact (libGLESv2)
+    - name: Upload Artifacts
       uses: actions/upload-artifact@v2
       if: success()
       with:
-        name: ${{ matrix.name }}-${{ matrix.arch }}-libGLESv2
-        path: angle/out/${{ matrix.arch }}/libGLESv2.${{ matrix.extension }}
-        if-no-files-found: error
-
-    - name: Upload Artifact (libEGL)
-      uses: actions/upload-artifact@v2
-      if: success()
-      with:
-        name: ${{ matrix.name }}-${{ matrix.arch }}-libEGL
-        path: angle/out/${{ matrix.arch }}/libEGL.${{ matrix.extension }}
+        name: ${{ matrix.name }}-${{ matrix.arch }}-${{ matrix.extension }}
+        path: |
+          angle/out/${{ matrix.arch }}/libGLESv2.${{ matrix.extension }}
+          angle/out/${{ matrix.arch }}/libEGL.${{ matrix.extension }}
         if-no-files-found: error
 
   angle-upload:
@@ -89,6 +74,13 @@ jobs:
     needs: [angle-build]
     runs-on: ubuntu-latest
     steps:
+      - name: Wait For Build
+        uses: fountainhead/action-wait-for-check@v1.0.0
+        id: wait-for-build
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: angle-build
+
       - name: Checkout Repo
         uses: actions/checkout@v2
         with:
@@ -104,6 +96,6 @@ jobs:
         uses: actions-js/push@master
         with:
           branch: angle-or-devil
-          message: "GHA: built and updated ANGLE to ${{ env.ANGLE_VERSION }}"
+          message: "(GHA) built and updated ANGLE to ${{ env.ANGLE_VERSION }}"
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
