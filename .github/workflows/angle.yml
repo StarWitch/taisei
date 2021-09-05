@@ -1,4 +1,4 @@
-name: ANGLE DLLs
+name: Build ANGLE Libs
 on:
   push:
     branches:
@@ -20,6 +20,7 @@ jobs:
           - { name: "Windows", os: "windows-2019", arch: "x64", extension: "dll" }
           - { name: "macOS", os: "macos-10.15", arch: "x64", extension: "dylib" }
           - { name: "macOS", os: "macos-10.15", arch: "arm64", extension: "dylib" }
+          - { name: "Linux", os: "ubuntu-latest", arch: "x64", extension: "so" }
     steps:
     - name: Clone ANGLE
       run: |
@@ -28,25 +29,25 @@ jobs:
         DEPOT_TOOLS_WIN_TOOLCHAIN: 0
 
     - name: Fetch Cached third_party
-      id: thirdparty-cache
+      id: third-party-cache
       uses: actions/cache@v2
       with:
         path: angle/third_party/
         key: thirdparty-${{ env.ANGLE_VERSION }}-${{ matrix.os }}
 
     - name: Fetch Cached angle/tools
-      id: angletools-cache
+      id: angle-tools-cache
       uses: actions/cache@v2
       with:
         path: angle/tools/
-        key: tools-${{ env.ANGLE_VERSION }}-${{ matrix.os }}
+        key: angletools-${{ env.ANGLE_VERSION }}-${{ matrix.os }}
 
     - name: Fetch Cached depot_tools
       id: depot-tools-cache
       uses: actions/cache@v2
       with:
-        path: angle/tools/
-        key: tools-${{ env.ANGLE_VERSION }}-${{ matrix.os }}
+        path: depot_tools/
+        key: depot-tools-${{ env.ANGLE_VERSION }}-${{ matrix.os }}
 
     - name: Install Depot Tools
       if: steps.depot-tools-cache.outputs.cache-hit != true
@@ -71,14 +72,38 @@ jobs:
       uses: actions/upload-artifact@v2
       if: success()
       with:
-        name: ${{ matrix.os }}-${{ matrix.arch }}-libGLESv2
-        path: out/${{ matrix.arch }}/libGLESv2.${{ matrix.extension }}
+        name: ${{ matrix.name }}-${{ matrix.arch }}-libGLESv2
+        path: angle/out/${{ matrix.arch }}/libGLESv2.${{ matrix.extension }}
         if-no-files-found: error
 
     - name: Upload Artifact (libEGL)
       uses: actions/upload-artifact@v2
       if: success()
       with:
-        name: ${{ matrix.os }}-${{ matrix.arch }}-libEGL
-        path: out/${{ matrix.arch }}/libEGL.${{ matrix.extension }}
+        name: ${{ matrix.name }}-${{ matrix.arch }}-libEGL
+        path: angle/out/${{ matrix.arch }}/libEGL.${{ matrix.extension }}
         if-no-files-found: error
+
+  angle-upload:
+    name: Push ANGLE Libraries
+    needs: [angle-build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+        with:
+          ref: angle-or-devil
+
+      - name: Download Artifacts From Build
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: angle.yml
+          path: angle/
+
+      - name: Commit & Push ANGLE Libraries
+        uses: actions-js/push@master
+        with:
+          branch: angle-or-devil
+          message: "GHA: built and updated ANGLE to ${{ env.ANGLE_VERSION }}"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
