@@ -6,7 +6,7 @@ on:
       - angle-or-devil
 
 env:
-  ANGLE_VERSION: 4484
+  ANGLE_VERSION: 4606
 
 jobs:
   angle-build:
@@ -67,7 +67,7 @@ jobs:
         angle_enable_d3d11=${{ contains(runner.os, 'Windows') }}
         angle_enable_d3d9=${{ contains(runner.os, 'Windows') }}
         angle_enable_metal=${{ contains(runner.os, 'macOS') }}
-        angle_enable_vulkan=${{ contains(runner.os, 'Linux') }}
+        angle_enable_vulkan=${{ contains(runner.os, 'Linux') || contains(runner.os, 'macOS') }}
         angle_enable_glsl=true
         angle_enable_gl=true
         angle_enable_essl=false
