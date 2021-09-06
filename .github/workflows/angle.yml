@@ -57,15 +57,13 @@ jobs:
 
         gclient sync
 
-        if [ "$RUNNER_OS" == "Linux" ]; then ./build/install-build-deps.sh --no-chromeos-fonts --no-prompt || true; fi;
-
         gn gen out/${{ matrix.arch }} --args='
         angle_enable_d3d11=${{ contains(runner.os, 'Windows') }}
         angle_enable_d3d9=${{ contains(runner.os, 'Windows') }}
         angle_enable_metal=${{ contains(runner.os, 'macOS') }}
         angle_enable_vulkan=${{ contains(runner.os, 'Linux') || contains(runner.os, 'macOS') }}
-        angle_enable_glsl=true
-        angle_enable_gl=true
+        angle_enable_glsl=false
+        angle_enable_gl=false
         angle_enable_essl=false
         is_debug=false
         dcheck_always_on=false
