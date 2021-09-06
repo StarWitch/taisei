@@ -47,6 +47,9 @@ jobs:
         path: angle/tools/
         key: angletools-${{ env.ANGLE_VERSION }}-${{ matrix.os }}
 
+    # TODO: set more to `false` when these bugs are fixed
+    # https://bugs.chromium.org/p/angleproject/issues/detail?id=6130
+    # https://bugs.chromium.org/p/angleproject/issues/detail?id=6231
     - name: Compile
       run: >
         export PATH=$PWD/depot_tools:$PATH
@@ -61,15 +64,15 @@ jobs:
         angle_enable_d3d11=${{ contains(runner.os, 'Windows') }}
         angle_enable_d3d9=${{ contains(runner.os, 'Windows') }}
         angle_enable_metal=${{ contains(runner.os, 'macOS') }}
+        angle_enable_gl=${{ contains(runner.os, 'macOS') }}
+        angle_enable_glsl=${{ contains(runner.os, 'macOS') }}
         angle_enable_vulkan=${{ contains(runner.os, 'Linux') || contains(runner.os, 'macOS') }}
-        angle_enable_glsl=false
-        angle_enable_gl=false
         angle_enable_essl=false
         is_debug=false
         dcheck_always_on=false
         target_cpu="${{ matrix.arch }}"'
 
-        ninja -C out/${{ matrix.arch }} libEGL libGLESv2
+        autoninja -C out/${{ matrix.arch }} libEGL libGLESv2
       env:
         DEPOT_TOOLS_WIN_TOOLCHAIN: 0
       shell: bash
