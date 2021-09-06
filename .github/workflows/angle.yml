@@ -33,12 +33,6 @@ jobs:
         git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
       shell: bash
 
-    # - name: Install Dependencies (Linux)
-    #   if: contains(matrix.name, 'Linux')
-    #   run: |
-    #     cd angle/ && ./build/install-build-deps.sh --no-chromeos-fonts --no-prompt
-    #   shell: bash
-
     - name: Fetch Cached third_party
       id: third-party-cache
       uses: actions/cache@v2
@@ -62,6 +56,8 @@ jobs:
         python ./scripts/bootstrap.py
 
         gclient sync
+
+        if [ "$RUNNER_OS" == "Linux" ]; then ./build/install-build-deps.sh --no-chromeos-fonts --no-prompt || true; fi;
 
         gn gen out/${{ matrix.arch }} --args='
         angle_enable_d3d11=${{ contains(runner.os, 'Windows') }}
