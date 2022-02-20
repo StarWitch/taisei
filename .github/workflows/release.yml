@@ -189,18 +189,8 @@ jobs:
   windows-release-build-x64:
     name: Windows (x64)
     runs-on: ubuntu-20.04
-    container: taiseiproject/windows-toolkit:20220220
+    container: taiseiproject/windows-toolkit:20220221
     steps:
-    - name: Install Tools
-      run: >
-        apt update || true
-
-        apt install -y -qq
-        gnupg
-
-        pip3 install
-        python-gnupg
-
     - name: Checkout Code
       uses: actions/checkout@v2
       with:
@@ -272,18 +262,8 @@ jobs:
   windows-release-build-x86:
     name: Windows (x86)
     runs-on: ubuntu-20.04
-    container: taiseiproject/windows-toolkit:20220220
+    container: taiseiproject/windows-toolkit:20220221
     steps:
-    - name: Install Tools
-      run: >
-        apt update || true
-
-        apt install -y -qq
-        gnupg
-
-        pip3 install
-        python-gnupg
-
     - name: Checkout Code
       uses: actions/checkout@v2
       with:
