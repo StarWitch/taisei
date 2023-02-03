@@ -71,6 +71,8 @@ jobs:
 
     - name: Configure
       run: >
+        git config --global --add safe.directory $(pwd)
+
         git fetch --force --tags # see: https://github.com/actions/checkout/issues/290
 
         meson setup build/linux
@@ -165,6 +167,7 @@ jobs:
 
     - name: Configure
       run: |
+        git config --global --add safe.directory $(pwd)
         git fetch --force --tags
         $(pwd)/scripts/macos_configure_env.sh $(pwd)/build-release/ $(pwd)
         $(pwd)/scripts/macos_setup_universal.sh
@@ -234,6 +237,8 @@ jobs:
 
     - name: Configure
       run: >
+        git config --global --add safe.directory $(pwd)
+
         git fetch --force --tags
 
         meson setup build/windows
@@ -313,6 +318,8 @@ jobs:
 
     - name: Configure
       run: >
+        git config --global --add safe.directory $(pwd)
+
         git fetch --force --tags
 
         meson setup build/windows
@@ -430,6 +437,8 @@ jobs:
 
     - name: Configure
       run: >
+        git config --global --add safe.directory $(pwd)
+
         git fetch --force --tags
 
         source ${{ env.EM_CACHE_FOLDER }}/emsdk_env.sh
@@ -493,6 +502,8 @@ jobs:
 
     - name: Configure
       run: >
+        git config --global --add safe.directory $(pwd)
+
         git fetch --force --tags
 
         switch/crossfile.sh > misc/ci/switch-crossfile-ci.ini
