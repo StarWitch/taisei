@@ -1,5 +1,6 @@
 build/
 build-release/
+angle-compiled/
 winbuild/
 osxbuild/
 releases/
@@ -14,4 +15,5 @@ __pycache__
 *~
 *-autosave.kra
 *.swp
+.mac_env
 .VERSION

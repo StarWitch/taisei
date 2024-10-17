@@ -224,6 +224,12 @@ jobs:
         gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
         passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
+    - name: Import macOS Codesign Certificate
+      uses: apple-actions/import-codesign-certs@v3
+      with:
+        p12-file-base64: ${{ secrets.MAC_CERTIFICATE_P12 }}
+        p12-password: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+
     - name: Checkout Code
       uses: actions/checkout@v4
       with:
@@ -253,7 +259,7 @@ jobs:
     - name: Build
       run: |
         echo "Version set to ${{ env.BUILD_VERSION }}"
-        $(pwd)/scripts/macos_build_universal.sh ${{ env.BUILD_VERSION }}
+        $(pwd)/scripts/macos_build_universal.sh ${{ env.BUILD_VERSION }} "${{ secrets.MAC_CERTIFICATE_ID }}"
       shell: bash
 
     - name: Sign Release
